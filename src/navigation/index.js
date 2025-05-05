@@ -1,0 +1,45 @@
+import React from 'react';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { useAuth } from '../context/AuthContext';
+
+// Import screens
+import SplashScreen from '../screens/SplashScreen';
+import OnboardingScreen from '../screens/onboarding/OnboardingScreen';
+import LoginScreen from '../screens/auth/LoginScreen';
+import SignupScreen from '../screens/auth/SignupScreen';
+import ForgotPasswordScreen from '../screens/auth/ForgotPasswordScreen';
+
+// Import navigation stacks
+import HomeStack from './HomeStack';
+
+const Stack = createNativeStackNavigator();
+
+const Navigation = () => {
+  const { isLoading, userToken, hasCompletedOnboarding } = useAuth();
+
+  if (isLoading) {
+    // Show splash screen while loading
+    return <SplashScreen />;
+  }
+
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      {!hasCompletedOnboarding ? (
+        // Show onboarding if not completed
+        <Stack.Screen name="Onboarding" component={OnboardingScreen} />
+      ) : userToken ? (
+        // User is logged in, show main app
+        <Stack.Screen name="HomeStack" component={HomeStack} />
+      ) : (
+        // User is not logged in, show auth screens
+        <Stack.Group>
+          <Stack.Screen name="Login" component={LoginScreen} />
+          <Stack.Screen name="Signup" component={SignupScreen} />
+          <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
+        </Stack.Group>
+      )}
+    </Stack.Navigator>
+  );
+};
+
+export default Navigation; 
