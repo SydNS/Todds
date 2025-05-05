@@ -1,50 +1,114 @@
-# Welcome to your Expo app 👋
+# Shekhinah Toddler's Learning App
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A React Native/Expo app focused on creating an educational platform for African toddlers, with colorful, interactive screens designed to make learning fun and engaging.
 
-## Get started
+## Features
 
-1. Install dependencies
+### 📱 Bottom Navigation Tabs
 
-   ```bash
+Each tab is color-coded with animated icons and child-friendly names:
+
+- **Story World** - Interactive stories and folktales with African themes
+- **Phonics Fun** - Letter learning with sounds and visuals
+- **Play & Learn** - Interactive exercise categories and games
+- **Today's Challenge** - Daily learning tasks based on skill level
+- **My Corner** - Child profile, progress tracking, and settings
+
+### 🎮 Play & Learn Categories
+
+A visually appealing page with categorized learning activities:
+
+- **Alphabet Adventure** - Trace, match, and say letters
+- **Animal Sounds Safari** - Match animals to their sounds
+- **Color Quest** - Identify and learn about colors
+- **Sound It Out!** - Phonics-based sound recognition
+- **Memory Mix** - Matching game for cognitive development
+- **Draw & Tell** - Creative drawing with voice recording
+
+### 🎯 Today's Challenge
+
+Interactive daily challenges with:
+
+- Skill-appropriate activities
+- Celebratory animations on completion
+- Progress tracking
+- "Try Again" and "Next Challenge" options
+
+### 👧 My Corner (Profile)
+
+A personalized space featuring:
+
+- Customizable avatar
+- Progress charts with fun visuals
+- Badge collection for achievements
+- Dark/light mode toggle
+- Settings for parents
+
+### ✨ Animation & Visual Design
+
+- **Kid-friendly UI** - Rounded corners, bright colors, and playful elements
+- **Interactive animations** - Button bounces, pulse effects, and celebratory animations
+- **Consistent theme** - Color-coded sections based on activity type
+- **Accessibility** - Dark mode and text size options
+
+## Technology Stack
+
+- **React Native** & **Expo** - Core framework
+- **React Navigation** - Tab and stack navigation
+- **@expo/vector-icons** - Icon sets
+- **react-native-reanimated** & **react-native-animatable** - Animation libraries
+- **lottie-react-native** - Complex animations
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js (>= 16)
+- Expo CLI
+- iOS Simulator or Android Emulator (or physical device)
+
+### Installation
+
+1. Clone the repository:
+
+   ```
+   git clone https://github.com/yourusername/shekhinah-toddlers-app.git
+   cd shekhinah-toddlers-app
+   ```
+
+2. Install dependencies:
+
+   ```
    npm install
    ```
 
-2. Start the app
+3. Start the Expo development server:
 
-   ```bash
-   npx expo start
+   ```
+   npm start
    ```
 
-In the output, you'll find options to open the app in a
+4. Open the app on your device or simulator:
+   - Press `i` for iOS simulator
+   - Press `a` for Android emulator
+   - Scan the QR code with Expo Go on your device
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+## Project Structure
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+- `/src/components` - Reusable UI components
+- `/src/constants` - Theme, colors, and design constants
+- `/src/screens` - App screens organized by feature
+- `/src/navigation` - Navigation configuration
+- `/src/utils` - Utility functions and animation helpers
+- `/src/assets` - Images, animations, and other static assets
 
-## Get a fresh project
+## Roadmap
 
-When you're ready, run:
+- Add content for Story World and Phonics Fun sections
+- Implement parent dashboard for monitoring progress
+- Add multilingual support for African languages
+- Integrate with backend for user accounts and progress syncing
 
-```bash
-npm run reset-project
-```
+## Contributors
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+- Sydney Nsiimbe - Project lead & Developer

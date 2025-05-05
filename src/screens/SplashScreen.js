@@ -1,84 +1,162 @@
+import { FontAwesome5 } from '@expo/vector-icons';
 import React, { useEffect } from 'react';
-import { View, Text, Image, StyleSheet, Animated } from 'react-native';
-import { COLORS } from '../constants/theme';
+import { ImageBackground, StyleSheet, Text, View } from 'react-native';
+import * as Animatable from 'react-native-animatable';
+import { COLORS, SIZES } from '../constants/theme';
 
 const SplashScreen = () => {
-  // Create animated values
-  const fadeAnim = React.useRef(new Animated.Value(0)).current;
-  const scaleAnim = React.useRef(new Animated.Value(0.8)).current;
-
   useEffect(() => {
-    // Start animations when component mounts
-    Animated.parallel([
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 1000,
-        useNativeDriver: true,
-      }),
-      Animated.timing(scaleAnim, {
-        toValue: 1,
-        duration: 1000,
-        useNativeDriver: true,
-      }),
-    ]).start();
-  }, [fadeAnim, scaleAnim]);
+    // Simulate loading time
+    const timer = setTimeout(() => {
+      // Navigation will be handled by the Authentication context
+    }, 2500);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
-    <View style={styles.container}>
-      <Animated.View
-        style={[
-          styles.logoContainer,
-          {
-            opacity: fadeAnim,
-            transform: [{ scale: scaleAnim }],
-          },
-        ]}
-      >
-        {/* Placeholder for app logo - replace with your actual logo */}
-        <View style={styles.logoPlaceholder}>
-          <Text style={styles.logoText}>S</Text>
-        </View>
-        <Text style={styles.appName}>Shekhinah Toddlers</Text>
-        <Text style={styles.tagline}>Learning made fun!</Text>
-      </Animated.View>
-    </View>
+    <ImageBackground
+      style={styles.container}
+      source={{ uri: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1IiBoZWlnaHQ9IjUiPgo8cmVjdCB3aWR0aD0iNSIgaGVpZ2h0PSI1IiBmaWxsPSIjZmZmZmZmIj48L3JlY3Q+CjxyZWN0IHdpZHRoPSIxIiBoZWlnaHQ9IjEiIGZpbGw9IiNmNWY1ZjUiPjwvcmVjdD4KPC9zdmc+' }}
+    >
+      <View style={styles.content}>
+        <Animatable.View 
+          animation="bounceIn"
+          duration={1500}
+          delay={300}
+          style={styles.logoContainer}
+        >
+          <View style={styles.logoInner}>
+            <FontAwesome5 name="book-open" size={50} color="#fff" />
+          </View>
+          <View style={styles.starContainer1}>
+            <Animatable.View animation="pulse" iterationCount="infinite" duration={1500}>
+              <FontAwesome5 name="star" size={18} color={COLORS.accent1} />
+            </Animatable.View>
+          </View>
+          <View style={styles.starContainer2}>
+            <Animatable.View animation="pulse" iterationCount="infinite" duration={2000} delay={200}>
+              <FontAwesome5 name="star" size={14} color={COLORS.accent3} />
+            </Animatable.View>
+          </View>
+          <View style={styles.starContainer3}>
+            <Animatable.View animation="pulse" iterationCount="infinite" duration={1800} delay={400}>
+              <FontAwesome5 name="star" size={16} color={COLORS.accent6} />
+            </Animatable.View>
+          </View>
+        </Animatable.View>
+        
+        <Animatable.View
+          animation="fadeIn"
+          duration={1000}
+          delay={1000}
+          style={styles.textContainer}
+        >
+          <Text style={styles.title}>Shekhinah</Text>
+          <Text style={styles.subtitle}>Toddler's Learning App</Text>
+        </Animatable.View>
+
+        <Animatable.View
+          animation="fadeInUp"
+          duration={1000}
+          delay={1500}
+          style={styles.loadingContainer}
+        >
+          <Text style={styles.loadingText}>Loading...</Text>
+          <Animatable.View
+            animation="slideInLeft"
+            iterationCount="infinite"
+            duration={1000}
+            style={styles.loadingBar}
+          />
+        </Animatable.View>
+      </View>
+    </ImageBackground>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: COLORS.background,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: COLORS.background,
+  },
+  content: {
+    flex: 1,
+    width: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   logoContainer: {
-    alignItems: 'center',
+    position: 'relative',
+    marginBottom: 40,
   },
-  logoPlaceholder: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    backgroundColor: COLORS.primary,
+  logoInner: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: COLORS.splash.primary,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 20,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 4.65,
+    elevation: 8,
   },
-  logoText: {
-    fontSize: 70,
-    fontWeight: 'bold',
-    color: COLORS.background,
+  starContainer1: {
+    position: 'absolute',
+    top: -15,
+    right: -15,
   },
-  appName: {
-    fontSize: 28,
+  starContainer2: {
+    position: 'absolute',
+    bottom: 10,
+    right: -20,
+  },
+  starContainer3: {
+    position: 'absolute',
+    left: -15,
+    top: 20,
+  },
+  textContainer: {
+    alignItems: 'center',
+    marginBottom: 60,
+  },
+  title: {
+    fontSize: SIZES.xxxlarge,
     fontWeight: 'bold',
     color: COLORS.text,
+    marginBottom: 8,
+    textShadowColor: 'rgba(0, 0, 0, 0.1)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 2,
+  },
+  subtitle: {
+    fontSize: SIZES.medium,
+    color: COLORS.textLight,
+    letterSpacing: 1,
+  },
+  loadingContainer: {
+    width: 200,
+    alignItems: 'center',
+  },
+  loadingText: {
+    fontSize: SIZES.small,
+    color: COLORS.textLight,
     marginBottom: 10,
   },
-  tagline: {
-    fontSize: 16,
-    color: COLORS.textLight,
-  },
+  loadingBar: {
+    height: 4,
+    width: '30%',
+    backgroundColor: COLORS.accent1,
+    borderRadius: 2,
+    alignSelf: 'flex-start',
+  }
 });
 
 export default SplashScreen; 

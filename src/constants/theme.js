@@ -2,7 +2,9 @@
  * Shekhinah Toddler's Learning App Theme
  */
 
+// Base colors
 export const COLORS = {
+  // Primary app colors
   primary: '#FF8A65',       // Soft coral
   secondary: '#4FC3F7',     // Bright sky blue
   tertiary: '#AED581',      // Soft green
@@ -10,24 +12,112 @@ export const COLORS = {
   card: '#F5F5F5',          // Light gray for cards
   text: '#333333',          // Dark gray for text
   textLight: '#757575',     // Medium gray for secondary text
+  
+  // Accent colors
   accent1: '#FFD54F',       // Soft yellow
   accent2: '#CE93D8',       // Soft purple
   accent3: '#81D4FA',       // Light blue
+  accent4: '#A5D6A7',       // Mint green
+  accent5: '#FFB74D',       // Orange
+  accent6: '#F06292',       // Pink
+  
+  // Status colors
   success: '#66BB6A',       // Green for success messages
   error: '#EF5350',         // Soft red for errors
   warning: '#FFCA28',       // Amber for warnings
   info: '#29B6F6',          // Light blue for info
+  
+  // Utility colors
   shadow: 'rgba(0, 0, 0, 0.1)', // Shadow color
   transparent: 'transparent',
   overlay: 'rgba(0, 0, 0, 0.5)', // Overlay color
+  
+  // Scene-specific colors
+  splash: {
+    primary: '#FF8A65',
+    secondary: '#4FC3F7',
+    accent: '#AED581',
+    highlight: '#FFD54F',
+  },
+  
+  onboarding: {
+    primary: '#CE93D8',
+    secondary: '#81D4FA',
+    accent: '#FFD54F',
+    highlight: '#A5D6A7',
+  },
+  
+  phonicsPlayground: {
+    primary: '#FF8A65',
+    secondary: '#64B5F6',
+    accent: '#FFB74D',
+    highlight: '#81C784',
+  },
+  
+  storyWorld: {
+    primary: '#FFB74D',
+    secondary: '#FF8A65',
+    accent: '#7986CB',
+    highlight: '#A1887F',
+  },
+  
+  gameZone: {
+    primary: '#4FC3F7',
+    secondary: '#FFD54F',
+    accent: '#FF8A65',
+    highlight: '#AED581',
+  },
+  
+  rhymeRhythm: {
+    primary: '#BA68C8',
+    secondary: '#4FC3F7',
+    accent: '#FFD54F',
+    highlight: '#FF8A65',
+  },
+  
+  dashboard: {
+    primary: '#FFD54F',
+    secondary: '#81C784',
+    accent: '#64B5F6',
+    highlight: '#FFCC80',
+  },
+  
+  dyslexiaFriendly: {
+    primary: '#B3E5FC',
+    secondary: '#C5E1A5',
+    accent: '#FFECB3',
+    highlight: '#E1BEE7',
+  },
+  
+  multilingual: {
+    primary: '#4DB6AC',
+    secondary: '#FFB74D',
+    accent: '#7986CB',
+    highlight: '#F06292',
+  },
 };
 
+// Font configurations
 export const FONT = {
   regular: 'System',        // We'll use system fonts for now
   medium: 'System',
   bold: 'System',
+  
+  // For dyslexia-friendly mode (to be implemented)
+  dyslexic: 'System',       // Will be replaced with OpenDyslexic when implemented
+  
+  // Font weights
+  weights: {
+    light: '300',
+    regular: '400',
+    medium: '500',
+    semiBold: '600',
+    bold: '700',
+    extraBold: '800',
+  }
 };
 
+// Size configurations for consistent UI
 export const SIZES = {
   // Global sizes
   base: 8,
@@ -37,6 +127,7 @@ export const SIZES = {
   large: 18,
   xlarge: 24,
   xxlarge: 32,
+  xxxlarge: 40,
   
   // Specific sizes
   buttonHeight: 50,
@@ -51,8 +142,20 @@ export const SIZES = {
   iconSmall: 16,
   iconMedium: 24,
   iconLarge: 32,
+  iconXLarge: 48,
+  
+  // Spacing system
+  spacing: {
+    xs: 4,
+    s: 8,
+    m: 16,
+    l: 24,
+    xl: 32,
+    xxl: 48,
+  }
 };
 
+// Shadow styles for different elevations
 export const SHADOWS = {
   small: {
     shadowColor: COLORS.shadow,
@@ -86,4 +189,74 @@ export const SHADOWS = {
   },
 };
 
-export default { COLORS, FONT, SIZES, SHADOWS }; 
+// Design system themes for different app sections
+export const THEMES = {
+  default: {
+    colors: {
+      primary: COLORS.primary,
+      secondary: COLORS.secondary,
+      background: COLORS.background,
+      text: COLORS.text,
+    },
+    fonts: FONT,
+    sizes: SIZES,
+    shadows: SHADOWS,
+  },
+  
+  splash: {
+    colors: {
+      primary: COLORS.splash.primary,
+      secondary: COLORS.splash.secondary,
+      accent: COLORS.splash.accent,
+      highlight: COLORS.splash.highlight,
+      background: COLORS.background,
+      text: COLORS.text,
+    },
+    fonts: FONT,
+    sizes: SIZES,
+    shadows: SHADOWS,
+  },
+  
+  onboarding: {
+    colors: {
+      primary: COLORS.onboarding.primary,
+      secondary: COLORS.onboarding.secondary,
+      accent: COLORS.onboarding.accent,
+      highlight: COLORS.onboarding.highlight,
+      background: COLORS.background,
+      text: COLORS.text,
+    },
+    fonts: FONT,
+    sizes: SIZES,
+    shadows: SHADOWS,
+  },
+  
+  // Additional themes for each section can be defined similarly
+  
+  // Special theme for dyslexia-friendly mode
+  dyslexiaFriendly: {
+    colors: {
+      primary: COLORS.dyslexiaFriendly.primary,
+      secondary: COLORS.dyslexiaFriendly.secondary,
+      accent: COLORS.dyslexiaFriendly.accent,
+      highlight: COLORS.dyslexiaFriendly.highlight,
+      background: '#F8F9FA', // Light cream background
+      text: '#333333',       // Dark text for contrast
+    },
+    fonts: {
+      ...FONT,
+      regular: 'OpenDyslexic',  // Will be implemented later
+      medium: 'OpenDyslexic',
+      bold: 'OpenDyslexic',
+    },
+    sizes: {
+      ...SIZES,
+      font: 16,      // Slightly larger text
+      medium: 18,
+      large: 20,
+    },
+    shadows: SHADOWS,
+  },
+};
+
+export default { COLORS, FONT, SIZES, SHADOWS, THEMES }; 

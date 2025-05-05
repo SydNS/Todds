@@ -1,53 +1,47 @@
-import React from 'react';
+import {
+  FontAwesome,
+  FontAwesome5,
+  Ionicons,
+  MaterialCommunityIcons
+} from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { View, Text, StyleSheet } from 'react-native';
-import { COLORS, SIZES } from '../constants/theme';
+import React from 'react';
+import { StyleSheet, Text, View } from 'react-native';
+import * as Animatable from 'react-native-animatable';
+import { COLORS, SHADOWS, SIZES } from '../constants/theme';
 
 // Import screens
-import HomeScreen from '../screens/home/HomeScreen';
-
-// Placeholder screens (will be implemented later)
-const ActivitiesScreen = () => (
-  <View style={styles.placeholder}>
-    <Text style={styles.placeholderText}>Activities Screen</Text>
-  </View>
-);
-
-const RewardsScreen = () => (
-  <View style={styles.placeholder}>
-    <Text style={styles.placeholderText}>Rewards Screen</Text>
-  </View>
-);
-
-const ProgressScreen = () => (
-  <View style={styles.placeholder}>
-    <Text style={styles.placeholderText}>Progress Screen</Text>
-  </View>
-);
-
-const ProfileScreen = () => (
-  <View style={styles.placeholder}>
-    <Text style={styles.placeholderText}>Profile Screen</Text>
-  </View>
-);
+import MyCornerScreen from '../screens/mycorner/MyCornerScreen';
+import PhonicsFunScreen from '../screens/phonicsfun/PhonicsFunScreen';
+import PlayLearnScreen from '../screens/playlearn/PlayLearnScreen';
+import StoryWorldScreen from '../screens/storyworld/StoryWorldScreen';
+import TodaysChallengeScreen from '../screens/todayschallenge/TodaysChallengeScreen';
 
 // Create tab navigator
 const Tab = createBottomTabNavigator();
 
-// Tab icon component (placeholder for now)
-const TabIcon = ({ name, focused }) => {
+// Animated tab icon component
+const AnimatedTabIcon = ({ name, focused, icon, color, size = 24 }) => {
   return (
     <View style={styles.tabIconContainer}>
-      <View 
+      <Animatable.View
+        animation={focused ? 'kidBounce' : undefined}
+        iterationCount={focused ? 1 : 1}
+        duration={1200}
         style={[
-          styles.tabIcon, 
-          { backgroundColor: focused ? COLORS.primary : COLORS.card }
-        ]} 
-      />
+          styles.iconBackground,
+          { backgroundColor: focused ? color : 'rgba(240,240,240,0.9)' }
+        ]}
+      >
+        {icon}
+      </Animatable.View>
       <Text 
         style={[
           styles.tabLabel, 
-          { color: focused ? COLORS.primary : COLORS.textLight }
+          { 
+            color: focused ? color : COLORS.textLight,
+            fontWeight: focused ? '600' : '400'
+          }
         ]}
       >
         {name}
@@ -63,45 +57,102 @@ const HomeStack = () => {
         headerShown: false,
         tabBarStyle: styles.tabBar,
         tabBarHideOnKeyboard: true,
+        tabBarActiveTintColor: COLORS.primary,
       }}
+      initialRouteName="PlayLearn"
     >
       <Tab.Screen 
-        name="Home" 
-        component={HomeScreen} 
+        name="StoryWorld" 
+        component={StoryWorldScreen} 
         options={{
-          tabBarIcon: ({ focused }) => <TabIcon name="Home" focused={focused} />,
+          tabBarIcon: ({ focused }) => (
+            <AnimatedTabIcon 
+              name="Story World" 
+              focused={focused} 
+              color={COLORS.storyWorld.primary}
+              icon={<FontAwesome5 
+                name="book-open" 
+                size={24} 
+                color={focused ? "#fff" : COLORS.storyWorld.primary} 
+              />}
+            />
+          ),
           tabBarLabel: () => null,
         }}
       />
       <Tab.Screen 
-        name="Activities" 
-        component={ActivitiesScreen} 
+        name="PhonicsFun" 
+        component={PhonicsFunScreen} 
         options={{
-          tabBarIcon: ({ focused }) => <TabIcon name="Activities" focused={focused} />,
+          tabBarIcon: ({ focused }) => (
+            <AnimatedTabIcon 
+              name="Phonics Fun" 
+              focused={focused} 
+              color={COLORS.phonicsPlayground.primary}
+              icon={<MaterialCommunityIcons 
+                name="alphabetical" 
+                size={28} 
+                color={focused ? "#fff" : COLORS.phonicsPlayground.primary} 
+              />}
+            />
+          ),
           tabBarLabel: () => null,
         }}
       />
       <Tab.Screen 
-        name="Rewards" 
-        component={RewardsScreen} 
+        name="PlayLearn" 
+        component={PlayLearnScreen} 
         options={{
-          tabBarIcon: ({ focused }) => <TabIcon name="Rewards" focused={focused} />,
+          tabBarIcon: ({ focused }) => (
+            <AnimatedTabIcon 
+              name="Play & Learn" 
+              focused={focused} 
+              color={COLORS.gameZone.primary}
+              icon={<FontAwesome5 
+                name="puzzle-piece" 
+                size={24} 
+                color={focused ? "#fff" : COLORS.gameZone.primary} 
+              />}
+            />
+          ),
           tabBarLabel: () => null,
         }}
       />
       <Tab.Screen 
-        name="Progress" 
-        component={ProgressScreen} 
+        name="TodaysChallenge" 
+        component={TodaysChallengeScreen} 
         options={{
-          tabBarIcon: ({ focused }) => <TabIcon name="Progress" focused={focused} />,
+          tabBarIcon: ({ focused }) => (
+            <AnimatedTabIcon 
+              name="Today's Challenge" 
+              focused={focused} 
+              color={COLORS.accent1}
+              icon={<FontAwesome 
+                name="target" 
+                size={24} 
+                color={focused ? "#fff" : COLORS.accent1} 
+              />}
+            />
+          ),
           tabBarLabel: () => null,
         }}
       />
       <Tab.Screen 
-        name="Profile" 
-        component={ProfileScreen} 
+        name="MyCorner" 
+        component={MyCornerScreen} 
         options={{
-          tabBarIcon: ({ focused }) => <TabIcon name="Profile" focused={focused} />,
+          tabBarIcon: ({ focused }) => (
+            <AnimatedTabIcon 
+              name="My Corner" 
+              focused={focused} 
+              color={COLORS.accent2}
+              icon={<Ionicons 
+                name="person" 
+                size={24} 
+                color={focused ? "#fff" : COLORS.accent2} 
+              />}
+            />
+          ),
           tabBarLabel: () => null,
         }}
       />
@@ -111,36 +162,35 @@ const HomeStack = () => {
 
 const styles = StyleSheet.create({
   tabBar: {
-    height: 70,
+    height: 75,
     backgroundColor: COLORS.background,
     borderTopWidth: 1,
-    borderTopColor: COLORS.card,
+    borderTopColor: 'rgba(0,0,0,0.05)',
     paddingTop: 5,
     paddingBottom: 10,
+    ...SHADOWS.large,
+    elevation: 10,
+    borderTopRightRadius: 20,
+    borderTopLeftRadius: 20,
   },
   tabIconContainer: {
     alignItems: 'center',
     justifyContent: 'center',
   },
-  tabIcon: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
+  iconBackground: {
+    width: 46,
+    height: 46,
+    borderRadius: 23,
+    alignItems: 'center',
+    justifyContent: 'center',
     marginBottom: 4,
+    ...SHADOWS.small,
   },
   tabLabel: {
     fontSize: SIZES.small,
-    fontWeight: '500',
-  },
-  placeholder: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: COLORS.background,
-  },
-  placeholderText: {
-    fontSize: SIZES.large,
-    color: COLORS.textLight,
+    marginTop: 2,
+    textAlign: 'center',
+    width: 70,
   },
 });
 
