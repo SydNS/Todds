@@ -4,12 +4,11 @@ import {
   FlatList,
   Image,
   SafeAreaView,
-  ScrollView,
   StatusBar,
   StyleSheet,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import { COLORS, SHADOWS, SIZES } from '../../constants/theme';
@@ -228,99 +227,101 @@ const PuzzlesGamesScreen = ({ navigation }) => {
         <View style={{ width: 40 }} />
       </View>
       
-      <ScrollView 
-        contentContainerStyle={styles.scrollContainer}
+      <FlatList
+        data={gameCategories}
+        keyExtractor={item => item.id}
+        renderItem={renderGameCategory}
         showsVerticalScrollIndicator={false}
-      >
-        {/* Welcome Banner */}
-        <Animatable.View 
-          animation="fadeIn" 
-          duration={800}
-          style={styles.welcomeBanner}
-        >
-          <View>
-            <Text style={styles.welcomeTitle}>Let's Play!</Text>
-            <Text style={styles.welcomeSubtitle}>Fun games to help you learn</Text>
-          </View>
-          <Animatable.View 
-            animation="pulse" 
-            iterationCount="infinite" 
-            duration={2000}
-          >
-            <FontAwesome5 name="gamepad" size={40} color={COLORS.gameZone.primary} />
-          </Animatable.View>
-        </Animatable.View>
-        
-        {/* Featured Game */}
-        <View style={styles.featuredContainer}>
-          <Text style={styles.sectionTitle}>Featured Game</Text>
-          <Animatable.View 
-            animation="fadeInUp" 
-            duration={800}
-            style={styles.featuredCard}
-          >
-            <Image 
-              source={{ uri: featuredGame.thumbnail }}
-              style={styles.featuredImage}
-              resizeMode="cover"
-            />
-            <View style={styles.featuredContent}>
-              <Text style={styles.featuredTitle}>{featuredGame.title}</Text>
-              <Text style={styles.featuredDescription}>
-                {featuredGame.description}
-              </Text>
-              <TouchableOpacity 
-                style={styles.playButton}
-                onPress={() => handleGamePress(featuredGame)}
+        contentContainerStyle={styles.scrollContainer}
+        ListHeaderComponent={() => (
+          <>
+            {/* Welcome Banner */}
+            <Animatable.View 
+              animation="fadeIn" 
+              duration={800}
+              style={styles.welcomeBanner}
+            >
+              <View>
+                <Text style={styles.welcomeTitle}>Let's Play!</Text>
+                <Text style={styles.welcomeSubtitle}>Fun games to help you learn</Text>
+              </View>
+              <Animatable.View 
+                animation="pulse" 
+                iterationCount="infinite" 
+                duration={2000}
               >
-                <Text style={styles.playButtonText}>Play Now</Text>
-                <FontAwesome5 name="play" size={12} color="#FFF" style={styles.buttonIcon} />
+                <FontAwesome5 name="gamepad" size={40} color={COLORS.gameZone.primary} />
+              </Animatable.View>
+            </Animatable.View>
+            
+            {/* Featured Game */}
+            <View style={styles.featuredContainer}>
+              <Text style={styles.sectionTitle}>Featured Game</Text>
+              <Animatable.View 
+                animation="fadeInUp" 
+                duration={800}
+                style={styles.featuredCard}
+              >
+                <Image 
+                  source={{ uri: featuredGame.thumbnail }}
+                  style={styles.featuredImage}
+                  resizeMode="cover"
+                />
+                <View style={styles.featuredContent}>
+                  <Text style={styles.featuredTitle}>{featuredGame.title}</Text>
+                  <Text style={styles.featuredDescription}>
+                    {featuredGame.description}
+                  </Text>
+                  <TouchableOpacity 
+                    style={styles.playButton}
+                    onPress={() => handleGamePress(featuredGame)}
+                  >
+                    <Text style={styles.playButtonText}>Play Now</Text>
+                    <FontAwesome5 name="play" size={12} color="#FFF" style={styles.buttonIcon} />
+                  </TouchableOpacity>
+                </View>
+              </Animatable.View>
+            </View>
+            
+            <Text style={styles.sectionTitle}>Game Categories</Text>
+          </>
+        )}
+        ListFooterComponent={() => (
+          <>
+            {/* See All Games Button */}
+            <Animatable.View 
+              animation="fadeInUp" 
+              duration={800}
+              style={styles.seeAllContainer}
+            >
+              <TouchableOpacity 
+                style={styles.seeAllButton}
+                onPress={() => navigation.navigate('GamesIndex')}
+              >
+                <Text style={styles.seeAllText}>See All Games</Text>
+                <FontAwesome5 name="arrow-right" size={16} color="#FFF" />
               </TouchableOpacity>
-            </View>
-          </Animatable.View>
-        </View>
-        
-        {/* Game Categories */}
-        <FlatList
-          data={gameCategories}
-          keyExtractor={item => item.id}
-          renderItem={renderGameCategory}
-          scrollEnabled={false}
-        />
-        
-        {/* See All Games Button */}
-        <Animatable.View 
-          animation="fadeInUp" 
-          duration={800}
-          style={styles.seeAllContainer}
-        >
-          <TouchableOpacity 
-            style={styles.seeAllButton}
-            onPress={() => navigation.navigate('GamesIndex')}
-          >
-            <Text style={styles.seeAllText}>See All Games</Text>
-            <FontAwesome5 name="arrow-right" size={16} color="#FFF" />
-          </TouchableOpacity>
-        </Animatable.View>
-        
-        {/* Adaptive Difficulty Info */}
-        <Animatable.View 
-          animation="fadeInUp" 
-          duration={800}
-          style={styles.adaptiveContainer}
-        >
-          <View style={styles.adaptiveContent}>
-            <FontAwesome5 name="chart-line" size={32} color={COLORS.gameZone.primary} style={styles.adaptiveIcon} />
-            <View>
-              <Text style={styles.adaptiveTitle}>Adaptive Difficulty</Text>
-              <Text style={styles.adaptiveDescription}>
-                Games adapt to your child's learning pace and skill level, providing just the right challenge!
-              </Text>
-            </View>
-          </View>
-        </Animatable.View>
-        
-      </ScrollView>
+            </Animatable.View>
+            
+            {/* Adaptive Difficulty Info */}
+            <Animatable.View 
+              animation="fadeInUp" 
+              duration={800}
+              style={styles.adaptiveContainer}
+            >
+              <View style={styles.adaptiveContent}>
+                <FontAwesome5 name="chart-line" size={32} color={COLORS.gameZone.primary} style={styles.adaptiveIcon} />
+                <View>
+                  <Text style={styles.adaptiveTitle}>Adaptive Difficulty</Text>
+                  <Text style={styles.adaptiveDescription}>
+                    Games adapt to your child's learning pace and skill level, providing just the right challenge!
+                  </Text>
+                </View>
+              </View>
+            </Animatable.View>
+          </>
+        )}
+      />
     </SafeAreaView>
   );
 };

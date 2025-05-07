@@ -1,14 +1,15 @@
 import { FontAwesome5, MaterialIcons } from '@expo/vector-icons';
-import React, { useState } from 'react';
+import { Audio } from 'expo-av';
+import React, { useEffect, useState } from 'react';
 import {
-    Dimensions,
-    Image,
-    SafeAreaView,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Dimensions,
+  Image,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import { COLORS, SHADOWS, SIZES } from '../../constants/theme';
@@ -21,12 +22,24 @@ const SoundItOutScreen = ({ navigation }) => {
   const [selectedOption, setSelectedOption] = useState(null);
   const [isCorrect, setIsCorrect] = useState(null);
   const [score, setScore] = useState(0);
+  const [sound, setSound] = useState(null);
+
+  // Cleanup sound on unmount
+  useEffect(() => {
+    return () => {
+      if (sound) {
+        console.log('Unloading Sound');
+        sound.unloadAsync();
+      }
+    };
+  }, [sound]);
 
   const levels = [
     {
       id: '1',
       targetSound: 'B',
       targetWord: 'Ball',
+      soundFile: require('../../../assets/sounds/b_sound.mp3'),
       targetImage: 'https://cdn-icons-png.flaticon.com/512/3097/3097648.png',
       options: ['B', 'D', 'P', 'T'],
       correctOption: 'B',
@@ -35,6 +48,7 @@ const SoundItOutScreen = ({ navigation }) => {
       id: '2',
       targetSound: 'S',
       targetWord: 'Snake',
+      soundFile: require('../../../assets/sounds/s_sound.mp3'),
       targetImage: 'https://cdn-icons-png.flaticon.com/512/3097/3097795.png',
       options: ['S', 'Z', 'C', 'F'],
       correctOption: 'S',
@@ -43,6 +57,7 @@ const SoundItOutScreen = ({ navigation }) => {
       id: '3',
       targetSound: 'M',
       targetWord: 'Mouse',
+      soundFile: require('../../../assets/sounds/m_sound.mp3'),
       targetImage: 'https://cdn-icons-png.flaticon.com/512/3097/3097878.png',
       options: ['M', 'N', 'W', 'V'],
       correctOption: 'M',
@@ -51,6 +66,7 @@ const SoundItOutScreen = ({ navigation }) => {
       id: '4',
       targetSound: 'C',
       targetWord: 'Cat',
+      soundFile: require('../../../assets/sounds/c_sound.mp3'),
       targetImage: 'https://cdn-icons-png.flaticon.com/512/3097/3097877.png',
       options: ['C', 'K', 'G', 'Q'],
       correctOption: 'C',
@@ -83,9 +99,30 @@ const SoundItOutScreen = ({ navigation }) => {
     }, 1500);
   };
   
+  async function playSound() {
+    const currentSound = levels[currentLevel].soundFile;
+    console.log('Loading Sound for:', levels[currentLevel].targetSound);
+    
+    try {
+      // Unload the previous sound if exists
+      if (sound) {
+        await sound.unloadAsync();
+      }
+      
+      // Create new sound instance
+      const { sound: newSound } = await Audio.Sound.createAsync(currentSound);
+      setSound(newSound);
+      
+      console.log('Playing Sound');
+      await newSound.playAsync();
+    } catch (error) {
+      console.error('Error playing sound:', error);
+    }
+  }
+  
   const handlePlaySound = () => {
-    // Here we would play the sound of the current target letter
-    console.log(`Playing sound for: ${levels[currentLevel].targetSound}`);
+    // Play the current target letter sound
+    playSound();
   };
   
   const currentLevelData = levels[currentLevel];

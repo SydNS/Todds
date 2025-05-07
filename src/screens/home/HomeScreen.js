@@ -45,24 +45,40 @@ const VideoCarousel = ({ data }) => {
 
   const handleVideoPress = (video) => {
     setSelectedVideo(video);
-    // Try to use expo-video first
-    if (player && !useExpoAV) {
-      player.replaceAsync(video.url)
-        .then(() => {
-          player.play();
-        })
-        .catch(error => {
-          console.error("Error playing video with expo-video:", error);
-          setUseExpoAV(true);
-        });
+    try {
+      // Try to use expo-video first
+      if (player && !useExpoAV) {
+        console.log("Loading video with expo-video:", video.url);
+        player.replaceAsync(video.url)
+          .then(() => {
+            console.log("Playing video");
+            player.play();
+          })
+          .catch(error => {
+            console.error("Error playing video with expo-video:", error);
+            setUseExpoAV(true);
+          });
+      }
+      setModalVisible(true);
+    } catch (error) {
+      console.error("Error in handleVideoPress:", error);
+      // Fall back to ExpoAV
+      setUseExpoAV(true);
+      setModalVisible(true);
     }
-    setModalVisible(true);
   };
 
   useEffect(() => {
     // Load the video using expo-video when modal is opened with useExpoAV
     if (modalVisible && useExpoAV && videoRef.current && selectedVideo) {
-      videoRef.current.loadAsync({ uri: selectedVideo.url }, {}, false);
+      console.log("Loading video with expo-av:", selectedVideo.url);
+      try {
+        videoRef.current.loadAsync({ uri: selectedVideo.url }, {}, false)
+          .then(() => videoRef.current.playAsync())
+          .catch(error => console.error("Error loading video with expo-av:", error));
+      } catch (error) {
+        console.error("Error in useEffect loading video:", error);
+      }
     }
   }, [modalVisible, useExpoAV, selectedVideo]);
 
@@ -225,28 +241,28 @@ const HomeScreen = ({ navigation }) => {
       title: 'ABC Song - Learn English Alphabet for Children',
       thumbnail: 'https://i.ytimg.com/vi/75p-N9YKqNo/maxresdefault.jpg',
       duration: '2:32',
-      url: 'https://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4', // Expo hosted sample video
+      url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4', // Updated to a sample video that should work
     },
     {
       id: '2',
       title: 'Numbers Song 1-10',
       thumbnail: 'https://i.ytimg.com/vi/DR-cfDsHCGA/maxresdefault.jpg',
       duration: '2:48',
-      url: 'https://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4', // Expo hosted sample video
+      url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4', // Updated to a sample video that should work
     },
     {
       id: '3',
       title: 'Phonics Song with Two Words',
       thumbnail: 'https://i.ytimg.com/vi/BELlZKpi1Zs/maxresdefault.jpg',
       duration: '2:38',
-      url: 'https://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4', // Expo hosted sample video
+      url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4', // Updated to a sample video that should work
     },
     {
       id: '4',
       title: 'Colors Song for Kids',
       thumbnail: 'https://i.ytimg.com/vi/_mVE4BJp8Zw/maxresdefault.jpg',
       duration: '3:05',
-      url: 'https://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4', // Expo hosted sample video
+      url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4', // Updated to a sample video that should work
     },
   ];
   

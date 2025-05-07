@@ -1,14 +1,15 @@
 import { FontAwesome5 } from '@expo/vector-icons';
-import React, { useState } from 'react';
+import { Audio } from 'expo-av';
+import React, { useEffect, useState } from 'react';
 import {
-    Dimensions,
-    Image,
-    SafeAreaView,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View
+  Dimensions,
+  Image,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import { COLORS, SHADOWS, SIZES } from '../../constants/theme';
@@ -19,53 +20,97 @@ const CARD_WIDTH = (width - 60) / 2;
 const AnimalSoundsScreen = ({ navigation }) => {
   const [selectedAnimal, setSelectedAnimal] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [sound, setSound] = useState(null);
+  
+  // Cleanup sound on unmount
+  useEffect(() => {
+    return () => {
+      if (sound) {
+        console.log('Unloading Sound');
+        sound.unloadAsync();
+      }
+    };
+  }, [sound]);
   
   const animals = [
     {
       id: '1',
       name: 'Lion',
       sound: 'Roar',
+      soundFile: require('../../../assets/sounds/lion.mp3'),
       image: 'https://cdn-icons-png.flaticon.com/512/2219/2219774.png'
     },
     {
       id: '2',
       name: 'Cow',
       sound: 'Moo',
+      soundFile: require('../../../assets/sounds/cow.mp3'),
       image: 'https://cdn-icons-png.flaticon.com/512/2219/2219673.png'
     },
     {
       id: '3',
       name: 'Dog',
       sound: 'Woof',
+      soundFile: require('../../../assets/sounds/dog.mp3'),
       image: 'https://cdn-icons-png.flaticon.com/512/2219/2219661.png'
     },
     {
       id: '4',
       name: 'Cat',
       sound: 'Meow',
+      soundFile: require('../../../assets/sounds/cat.mp3'),
       image: 'https://cdn-icons-png.flaticon.com/512/2219/2219673.png'
     },
     {
       id: '5',
       name: 'Sheep',
       sound: 'Baa',
+      soundFile: require('../../../assets/sounds/sheep.mp3'),
       image: 'https://cdn-icons-png.flaticon.com/512/2219/2219759.png'
     },
     {
       id: '6',
       name: 'Horse',
       sound: 'Neigh',
+      soundFile: require('../../../assets/sounds/horse.mp3'),
       image: 'https://cdn-icons-png.flaticon.com/512/2219/2219719.png'
     },
   ];
   
+  async function playSound(animal) {
+    console.log('Loading Sound');
+    try {
+      // Unload the previous sound if exists
+      if (sound) {
+        await sound.unloadAsync();
+      }
+      
+      // Create new sound instance
+      const { sound: newSound } = await Audio.Sound.createAsync(animal.soundFile);
+      setSound(newSound);
+      
+      console.log('Playing Sound');
+      await newSound.playAsync();
+      
+      // Set playing state for UI animation
+      setIsPlaying(true);
+      
+      // Reset playing state after sound duration
+      newSound.setOnPlaybackStatusUpdate((status) => {
+        if (status.didJustFinish) {
+          setIsPlaying(false);
+        }
+      });
+    } catch (error) {
+      console.error('Error playing sound:', error);
+      setIsPlaying(false);
+    }
+  }
+  
   const handleAnimalPress = (animal) => {
     setSelectedAnimal(animal);
-    // Here we would play the animal sound
-    setIsPlaying(true);
-    setTimeout(() => {
-      setIsPlaying(false);
-    }, 2000);
+    // Play the animal sound
+    playSound(animal);
   };
   
   return (
