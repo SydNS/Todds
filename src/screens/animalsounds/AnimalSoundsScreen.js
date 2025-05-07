@@ -54,48 +54,48 @@ const AnimalSoundsScreen = ({ navigation }) => {
     };
   }, [sound]);
   
-  // Updated animal data with local static sound files
+  // Updated animal data with reliable HTTPS audio sources
   const animals = [
     {
       id: '1',
       name: 'Lion',
       sound: 'Roar',
-      audioUrl: 'https://assets.mixkit.co/sfx/preview/mixkit-lion-roar-big-cat-13.mp3',
+      audioUrl: 'https://actions.google.com/sounds/v1/animals/large_cat_growl.ogg',
       image: 'https://cdn-icons-png.flaticon.com/512/2219/2219774.png'
     },
     {
       id: '2',
       name: 'Cow',
       sound: 'Moo',
-      audioUrl: 'https://assets.mixkit.co/sfx/preview/mixkit-cow-moo-1747.mp3',
+      audioUrl: 'https://actions.google.com/sounds/v1/animals/cow_moo.ogg',
       image: 'https://cdn-icons-png.flaticon.com/512/2219/2219673.png'
     },
     {
       id: '3',
       name: 'Dog',
       sound: 'Woof',
-      audioUrl: 'https://assets.mixkit.co/sfx/preview/mixkit-dog-barking-twice-1.mp3',
+      audioUrl: 'https://actions.google.com/sounds/v1/animals/dog_barking.ogg',
       image: 'https://cdn-icons-png.flaticon.com/512/2219/2219661.png'
     },
     {
       id: '4',
       name: 'Cat',
       sound: 'Meow',
-      audioUrl: 'https://assets.mixkit.co/sfx/preview/mixkit-domestic-cat-hungry-meow-45.mp3',
+      audioUrl: 'https://actions.google.com/sounds/v1/animals/cat_meow.ogg',
       image: 'https://cdn-icons-png.flaticon.com/512/2219/2219673.png'
     },
     {
       id: '5',
       name: 'Sheep',
       sound: 'Baa',
-      audioUrl: 'https://assets.mixkit.co/sfx/preview/mixkit-sheep-bleat-1740.mp3',
+      audioUrl: 'https://actions.google.com/sounds/v1/animals/animal_sounds_sheep.ogg',
       image: 'https://cdn-icons-png.flaticon.com/512/2219/2219759.png'
     },
     {
       id: '6',
       name: 'Horse',
       sound: 'Neigh',
-      audioUrl: 'https://assets.mixkit.co/sfx/preview/mixkit-horse-neighs-and-blows-719.mp3',
+      audioUrl: 'https://actions.google.com/sounds/v1/animals/horse_gallop.ogg',
       image: 'https://cdn-icons-png.flaticon.com/512/2219/2219719.png'
     },
   ];
@@ -106,10 +106,12 @@ const AnimalSoundsScreen = ({ navigation }) => {
     try {
       // Unload the previous sound if it exists
       if (sound) {
+        console.log('Unloading previous sound');
         await sound.unloadAsync();
       }
       
       // Set up audio mode for playback
+      console.log('Setting up audio mode');
       await Audio.setAudioModeAsync({
         allowsRecordingIOS: false,
         staysActiveInBackground: false,
@@ -120,18 +122,34 @@ const AnimalSoundsScreen = ({ navigation }) => {
       
       console.log('Loading sound from URL:', animal.audioUrl);
       
-      // Create and load new sound from URL instead of local file
+      // Create and load new sound from URL
       const { sound: newSound } = await Audio.Sound.createAsync(
         { uri: animal.audioUrl },
-        { shouldPlay: true, volume: 1.0 }
+        { shouldPlay: true, volume: 1.0 },
+        (status) => {
+          console.log('Loading status:', status);
+          if (status.error) {
+            console.error('Sound loading error:', status.error);
+          }
+        }
       );
       
+      console.log('Sound loaded successfully');
       setSound(newSound);
       setIsPlaying(true);
       
       // Monitor playback status
       newSound.setOnPlaybackStatusUpdate((status) => {
-        console.log('Playback status:', status.isPlaying ? 'Playing' : 'Stopped');
+        // Log playback status
+        if (status.isLoaded) {
+          console.log('Playback status:', 
+            status.isPlaying ? 'Playing' : 'Paused', 
+            'Position:', status.positionMillis,
+            'Duration:', status.durationMillis
+          );
+        } else if (status.error) {
+          console.error('Playback error:', status.error);
+        }
         
         if (status.didJustFinish) {
           console.log('Sound finished playing');
@@ -141,7 +159,17 @@ const AnimalSoundsScreen = ({ navigation }) => {
       
     } catch (error) {
       console.error('Error playing sound:', error);
-      Alert.alert('Sound Error', 'There was a problem playing the animal sound.');
+      
+      // More detailed error information
+      const errorDetails = error.message ? `\nDetails: ${error.message}` : '';
+      const errorCode = error.code ? `\nCode: ${error.code}` : '';
+      
+      Alert.alert(
+        'Sound Error', 
+        `There was a problem playing the animal sound.${errorDetails}${errorCode}`,
+        [{ text: 'OK' }]
+      );
+      
       setIsPlaying(false);
     }
   }

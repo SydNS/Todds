@@ -1,5 +1,4 @@
 import { FontAwesome5 } from '@expo/vector-icons';
-import { VideoView, useVideoPlayer } from 'expo-video';
 import React, { useEffect, useRef, useState } from 'react';
 import {
   Image,
@@ -13,6 +12,7 @@ import {
   View
 } from 'react-native';
 import * as Animatable from 'react-native-animatable';
+import { WebView } from 'react-native-webview';
 import { COLORS, SHADOWS, SIZES } from '../../constants/theme';
 
 const SingWithUsScreen = ({ navigation }) => {
@@ -22,60 +22,47 @@ const SingWithUsScreen = ({ navigation }) => {
   const progressInterval = useRef(null);
   const [progress, setProgress] = useState(0);
   
-  // Create the player at the top level with null initial source
-  const player = useVideoPlayer(null);
-  
-  // Song data with direct video URLs
+  // Song data with YouTube IDs
   const songs = [
     {
       id: '1',
-      title: 'ABC Song - Learn English Alphabet',
+      title: 'Shapes for Kids to Learn - Learning Shapes for Toddlers',
       category: 'Educational',
-      duration: '2:32',
-      thumbnail: 'https://i.ytimg.com/vi/75p-N9YKqNo/maxresdefault.jpg',
+      duration: '3:15',
+      thumbnail: 'https://img.youtube.com/vi/noCiE_1YRJo/maxresdefault.jpg',
       hasLyrics: true,
       hasSignLanguage: true,
-      url: 'https://assets.mixkit.co/videos/preview/mixkit-a-girl-blowing-a-bubble-gum-at-an-amusement-park-1226-large.mp4',
+      youtubeId: 'noCiE_1YRJo'
     },
     {
       id: '2',
-      title: 'Twinkle Twinkle Little Star',
-      category: 'Bedtime',
-      duration: '2:10',
-      thumbnail: 'https://i.ytimg.com/vi/yCjJyiqpAuU/maxresdefault.jpg',
+      title: 'Phonics Song with TWO Words - A For Apple - ABC Alphabet Songs',
+      category: 'Educational',
+      duration: '4:02',
+      thumbnail: 'https://img.youtube.com/vi/DvTAWOItdAg/maxresdefault.jpg',
       hasLyrics: true,
       hasSignLanguage: true,
-      url: 'https://assets.mixkit.co/videos/preview/mixkit-little-girl-in-nature-with-a-marshmallow-on-a-twig-39766-large.mp4',
+      youtubeId: 'DvTAWOItdAg'
     },
     {
       id: '3',
-      title: 'Phonics Song with Two Words',
-      category: 'Educational',
-      duration: '2:38',
-      thumbnail: 'https://i.ytimg.com/vi/BELlZKpi1Zs/maxresdefault.jpg',
+      title: 'Counting Numbers 1 to 10 - Simple Number Counting for Toddlers',
+      category: 'Counting',
+      duration: '2:55',
+      thumbnail: 'https://img.youtube.com/vi/FzAACRBg_Qc/maxresdefault.jpg',
       hasLyrics: true,
       hasSignLanguage: false,
-      url: 'https://assets.mixkit.co/videos/preview/mixkit-mother-with-her-little-daughter-eating-a-marshmallow-in-nature-39764-large.mp4',
+      youtubeId: 'FzAACRBg_Qc'
     },
     {
       id: '4',
-      title: 'Numbers Song 1-10',
-      category: 'Counting',
-      duration: '2:48',
-      thumbnail: 'https://i.ytimg.com/vi/DR-cfDsHCGA/maxresdefault.jpg',
+      title: 'ABC Phonics | Reading for Kids Part 1 | LOTTY LEARNS',
+      category: 'Educational',
+      duration: '3:21',
+      thumbnail: 'https://img.youtube.com/vi/fYEzqbRGwcY/maxresdefault.jpg',
       hasLyrics: true,
       hasSignLanguage: false,
-      url: 'https://assets.mixkit.co/videos/preview/mixkit-girl-in-neon-sign-1232-large.mp4',
-    },
-    {
-      id: '5',
-      title: 'Colors Song for Kids',
-      category: 'Educational',
-      duration: '3:05',
-      thumbnail: 'https://i.ytimg.com/vi/_mVE4BJp8Zw/maxresdefault.jpg',
-      hasLyrics: true,
-      hasSignLanguage: true,
-      url: 'https://assets.mixkit.co/videos/preview/mixkit-kids-playing-in-the-water-in-a-pool-3406-large.mp4',
+      youtubeId: 'fYEzqbRGwcY'
     },
   ];
   
@@ -155,20 +142,12 @@ const SingWithUsScreen = ({ navigation }) => {
 
   const openVideoModal = () => {
     if (currentSong) {
-      // Update the player source instead of creating a new one
-      player.replaceAsync(currentSong.url)
-        .then(() => {
-          player.play();
-        });
       setVideoModalVisible(true);
     }
   };
 
   const closeVideoModal = () => {
     setVideoModalVisible(false);
-    if (player) {
-      player.pause();
-    }
   };
 
   return (
@@ -357,11 +336,19 @@ const SingWithUsScreen = ({ navigation }) => {
               </TouchableOpacity>
               
               {currentSong && (
-                <VideoView
-                  player={player}
-                  style={styles.video}
-                  nativeControls
-                />
+                <View style={styles.videoWrapper}>
+                  <WebView
+                    source={{ 
+                      uri: `https://www.youtube.com/embed/${currentSong.youtubeId}?rel=0&autoplay=1&playsinline=1` 
+                    }}
+                    style={styles.video}
+                    allowsFullscreenVideo
+                    mediaPlaybackRequiresUserAction={false}
+                    javaScriptEnabled={true}
+                    domStorageEnabled={true}
+                  />
+                  <Text style={styles.videoTitle}>{currentSong.title}</Text>
+                </View>
               )}
             </View>
           </View>
@@ -694,9 +681,25 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  videoWrapper: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   video: {
     width: '100%',
     height: '100%',
+  },
+  videoTitle: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    color: '#FFF',
+    fontSize: SIZES.font,
+    fontWeight: 'bold',
+    padding: SIZES.small,
   },
 });
 

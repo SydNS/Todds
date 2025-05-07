@@ -183,31 +183,31 @@ const HomeScreen = ({ navigation }) => {
   const videoData = [
     {
       id: '1',
-      title: 'ABC Song for Children - Learn the Alphabet',
-      thumbnail: 'https://img.youtube.com/vi/75p-N9YKqNo/maxresdefault.jpg',
-      duration: '2:32',
-      youtubeId: '75p-N9YKqNo'
+      title: 'Shapes for Kids to Learn - Learning Shapes for Toddlers',
+      thumbnail: 'https://img.youtube.com/vi/noCiE_1YRJo/maxresdefault.jpg',
+      duration: '3:15',
+      youtubeId: 'noCiE_1YRJo'
     },
     {
       id: '2',
-      title: 'Numbers Song 1-10 | Counting Numbers for Kids',
-      thumbnail: 'https://img.youtube.com/vi/DR-cfDsHCGA/maxresdefault.jpg',
-      duration: '2:48',
-      youtubeId: 'DR-cfDsHCGA'
+      title: 'Phonics Song with TWO Words - A For Apple - ABC Alphabet Songs with Sounds for Children',
+      thumbnail: 'https://img.youtube.com/vi/DvTAWOItdAg/maxresdefault.jpg',
+      duration: '4:02',
+      youtubeId: 'DvTAWOItdAg'
     },
     {
       id: '3',
-      title: 'Phonics Song with Two Words | Alphabet Learning',
-      thumbnail: 'https://img.youtube.com/vi/BELlZKpi1Zs/maxresdefault.jpg',
-      duration: '2:38',
-      youtubeId: 'BELlZKpi1Zs'
+      title: 'Counting Numbers 1 to 10 - Simple Number Counting for Toddlers',
+      thumbnail: 'https://img.youtube.com/vi/FzAACRBg_Qc/maxresdefault.jpg',
+      duration: '2:55',
+      youtubeId: 'FzAACRBg_Qc'
     },
     {
       id: '4',
-      title: 'Colors Song for Kids | Learning Colors',
-      thumbnail: 'https://img.youtube.com/vi/_mVE4BJp8Zw/maxresdefault.jpg',
-      duration: '3:05',
-      youtubeId: '_mVE4BJp8Zw'
+      title: 'ABC Phonics | Reading for Kids Part 1 | LOTTY LEARNS',
+      thumbnail: 'https://img.youtube.com/vi/fYEzqbRGwcY/maxresdefault.jpg',
+      duration: '3:21',
+      youtubeId: 'fYEzqbRGwcY'
     },
   ];
   

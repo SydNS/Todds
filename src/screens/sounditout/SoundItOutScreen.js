@@ -61,7 +61,7 @@ const SoundItOutScreen = ({ navigation }) => {
       id: '1',
       targetSound: 'B',
       targetWord: 'Ball',
-      audioUrl: 'https://assets.mixkit.co/sfx/preview/mixkit-cartoon-toy-whistle-616.mp3',
+      audioUrl: 'https://actions.google.com/sounds/v1/alarms/beep_short.ogg',
       targetImage: 'https://cdn-icons-png.flaticon.com/512/3097/3097648.png',
       options: ['B', 'D', 'P', 'T'],
       correctOption: 'B',
@@ -70,7 +70,7 @@ const SoundItOutScreen = ({ navigation }) => {
       id: '2',
       targetSound: 'S',
       targetWord: 'Snake',
-      audioUrl: 'https://assets.mixkit.co/sfx/preview/mixkit-cinematic-fairy-water-splashes-538.mp3',
+      audioUrl: 'https://actions.google.com/sounds/v1/science_fiction/alien_static_noise.ogg',
       targetImage: 'https://cdn-icons-png.flaticon.com/512/3097/3097795.png',
       options: ['S', 'Z', 'C', 'F'],
       correctOption: 'S',
@@ -79,7 +79,7 @@ const SoundItOutScreen = ({ navigation }) => {
       id: '3',
       targetSound: 'M',
       targetWord: 'Mouse',
-      audioUrl: 'https://assets.mixkit.co/sfx/preview/mixkit-cartoon-falling-whistle-395.mp3',
+      audioUrl: 'https://actions.google.com/sounds/v1/cartoon/pop.ogg',
       targetImage: 'https://cdn-icons-png.flaticon.com/512/3097/3097878.png',
       options: ['M', 'N', 'W', 'V'],
       correctOption: 'M',
@@ -88,7 +88,7 @@ const SoundItOutScreen = ({ navigation }) => {
       id: '4',
       targetSound: 'C',
       targetWord: 'Cat',
-      audioUrl: 'https://assets.mixkit.co/sfx/preview/mixkit-cat-meow-mammal-4520.mp3',
+      audioUrl: 'https://actions.google.com/sounds/v1/animals/cat_meow.ogg',
       targetImage: 'https://cdn-icons-png.flaticon.com/512/3097/3097877.png',
       options: ['C', 'K', 'G', 'Q'],
       correctOption: 'C',
@@ -128,10 +128,12 @@ const SoundItOutScreen = ({ navigation }) => {
     try {
       // Unload the previous sound if it exists
       if (sound) {
+        console.log('Unloading previous sound');
         await sound.unloadAsync();
       }
       
       // Set up audio mode
+      console.log('Setting up audio mode');
       await Audio.setAudioModeAsync({
         allowsRecordingIOS: false,
         staysActiveInBackground: false,
@@ -145,14 +147,30 @@ const SoundItOutScreen = ({ navigation }) => {
       // Create new sound instance from URL
       const { sound: newSound } = await Audio.Sound.createAsync(
         { uri: currentSound.audioUrl },
-        { shouldPlay: true, volume: 1.0 }
+        { shouldPlay: true, volume: 1.0 },
+        (status) => {
+          console.log('Loading status:', status);
+          if (status.error) {
+            console.error('Sound loading error:', status.error);
+          }
+        }
       );
       
+      console.log('Sound loaded successfully');
       setSound(newSound);
       
       // Monitor playback status
       newSound.setOnPlaybackStatusUpdate((status) => {
-        console.log('Playback status:', status.isPlaying ? 'Playing' : 'Stopped');
+        // Log playback status
+        if (status.isLoaded) {
+          console.log('Playback status:', 
+            status.isPlaying ? 'Playing' : 'Paused', 
+            'Position:', status.positionMillis,
+            'Duration:', status.durationMillis
+          );
+        } else if (status.error) {
+          console.error('Playback error:', status.error);
+        }
         
         if (status.didJustFinish) {
           console.log('Sound finished playing');
@@ -161,7 +179,16 @@ const SoundItOutScreen = ({ navigation }) => {
       
     } catch (error) {
       console.error('Error playing sound:', error);
-      Alert.alert('Sound Error', 'There was a problem playing the sound.');
+      
+      // More detailed error information
+      const errorDetails = error.message ? `\nDetails: ${error.message}` : '';
+      const errorCode = error.code ? `\nCode: ${error.code}` : '';
+      
+      Alert.alert(
+        'Sound Error', 
+        `There was a problem playing the sound.${errorDetails}${errorCode}`,
+        [{ text: 'OK' }]
+      );
     }
   }
   
