@@ -18,10 +18,10 @@ import * as Animatable from 'react-native-animatable';
 import { COLORS, SHADOWS, SIZES } from '../../constants/theme';
 
 const { width } = Dimensions.get('window');
-const COLUMN_WIDTH = width * 0.42;
-const SPACING = 16;
+const CARD_WIDTH = (width - (SIZES.screenPadding * 2) - 16) / 2; // Two columns with spacing
 
 const PlayLearnScreen = ({ navigation }) => {
+  // Updated categories without Children's Books
   const categories = [
     {
       id: '1',
@@ -29,8 +29,7 @@ const PlayLearnScreen = ({ navigation }) => {
       description: 'Trace, match, and say letters',
       icon: <FontAwesome5 name="font" size={34} color="#333" />,
       backgroundColor: COLORS.accent3,
-      onPress: () => console.log('Alphabet Adventure pressed'),
-      height: 180,
+      screen: 'AlphabetAdventure',
     },
     {
       id: '2',
@@ -38,8 +37,7 @@ const PlayLearnScreen = ({ navigation }) => {
       description: 'Match animals to sounds',
       icon: <FontAwesome5 name="paw" size={34} color="#333" />,
       backgroundColor: COLORS.accent5,
-      onPress: () => console.log('Animal Sounds Safari pressed'),
-      height: 200,
+      screen: 'AnimalSounds',
     },
     {
       id: '3',
@@ -47,8 +45,7 @@ const PlayLearnScreen = ({ navigation }) => {
       description: 'Pick and name colors',
       icon: <Ionicons name="color-palette" size={34} color="#333" />,
       backgroundColor: COLORS.accent6,
-      onPress: () => console.log('Color Quest pressed'),
-      height: 220,
+      screen: 'ColorQuest',
     },
     {
       id: '4',
@@ -56,8 +53,7 @@ const PlayLearnScreen = ({ navigation }) => {
       description: 'Hear and tap the correct sound',
       icon: <FontAwesome5 name="headphones" size={34} color="#333" />,
       backgroundColor: COLORS.accent2,
-      onPress: () => console.log('Sound It Out! pressed'),
-      height: 190,
+      screen: 'SoundItOut',
     },
     {
       id: '5',
@@ -65,8 +61,7 @@ const PlayLearnScreen = ({ navigation }) => {
       description: 'Flip cards, match shapes/sounds',
       icon: <MaterialCommunityIcons name="cards" size={34} color="#333" />,
       backgroundColor: COLORS.accent1,
-      onPress: () => console.log('Memory Mix pressed'),
-      height: 210,
+      screen: 'MemoryMix',
     },
     {
       id: '6',
@@ -74,25 +69,19 @@ const PlayLearnScreen = ({ navigation }) => {
       description: 'Simple canvas to draw and speak',
       icon: <FontAwesome5 name="paint-brush" size={34} color="#333" />,
       backgroundColor: COLORS.tertiary,
-      onPress: () => console.log('Draw & Tell pressed'),
-      height: 170,
-    },
-    {
-      id: '7',
-      title: 'Children\'s Books',
-      description: 'Read interactive storybooks',
-      icon: <FontAwesome5 name="book-open" size={34} color="#333" />,
-      backgroundColor: COLORS.storyWorld.primary,
-      onPress: () => navigation.navigate('Books'),
-      height: 190,
+      screen: 'DrawAndTell',
     }
   ];
 
-  const backgroundPattern = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1IiBoZWlnaHQ9IjUiPgo8cmVjdCB3aWR0aD0iNSIgaGVpZ2h0PSI1IiBmaWxsPSIjZmZmIj48L3JlY3Q+CjxyZWN0IHdpZHRoPSIxIiBoZWlnaHQ9IjEiIGZpbGw9IiNmMGYwZjAiPjwvcmVjdD4KPC9zdmc+';
+  const handleCardPress = (category) => {
+    // Pass the title and color to the placeholder screen
+    navigation.navigate(category.screen, { 
+      title: category.title,
+      color: category.backgroundColor
+    });
+  };
 
-  // Organize categories into two columns for staggered grid
-  const leftColumn = categories.filter((_, index) => index % 2 === 0);
-  const rightColumn = categories.filter((_, index) => index % 2 !== 0);
+  const backgroundPattern = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1IiBoZWlnaHQ9IjUiPgo8cmVjdCB3aWR0aD0iNSIgaGVpZ2h0PSI1IiBmaWxsPSIjZmZmIj48L3JlY3Q+CjxyZWN0IHdpZHRoPSIxIiBoZWlnaHQ9IjEiIGZpbGw9IiNmMGYwZjAiPjwvcmVjdD4KPC9zdmc+';
 
   return (
     <SafeAreaView style={styles.container}>
@@ -100,97 +89,42 @@ const PlayLearnScreen = ({ navigation }) => {
         source={{ uri: backgroundPattern }}
         style={styles.backgroundPattern}
       >
-        <Animatable.View 
-          animation="fadeIn" 
-          duration={800} 
-          style={styles.header}
-        >
-          <View style={styles.headerContent}>
-            <Text style={styles.title}>Play & Learn</Text>
-            <Text style={styles.subtitle}>Choose an activity to play and learn!</Text>
-          </View>
-          <Animatable.View 
-            animation="bounceIn" 
-            delay={500}
-            style={styles.decoration}
-          >
-            <FontAwesome5 name="star" size={18} color={COLORS.accent1} style={styles.star} />
-            <FontAwesome5 name="star" size={12} color={COLORS.accent6} style={[styles.star, {transform: [{rotate: '15deg'}]}]} />
-            <FontAwesome5 name="star" size={10} color={COLORS.accent3} style={[styles.star, {transform: [{rotate: '-15deg'}]}]} />
-          </Animatable.View>
-        </Animatable.View>
+        <View style={styles.header}>
+          <Text style={styles.title}>Play & Learn</Text>
+          <Text style={styles.subtitle}>Choose an activity to play and learn!</Text>
+          <FontAwesome5 name="star" size={18} color={COLORS.accent1} style={styles.star} />
+        </View>
 
         <ScrollView 
-          style={styles.scrollView}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.scrollViewContent}
         >
-          <View style={styles.staggeredGrid}>
-            {/* Left Column */}
-            <View style={styles.column}>
-              {leftColumn.map((category, index) => (
-                <Animatable.View
-                  key={category.id}
-                  animation="fadeInUp"
-                  delay={300 + (index * 100)}
-                  duration={500}
-                  style={styles.cardWrapper}
+          <View style={styles.cardsGrid}>
+            {categories.map((category) => (
+              <Animatable.View
+                key={category.id}
+                animation="fadeInUp"
+                delay={200 + (parseInt(category.id) * 100)}
+                duration={500}
+              >
+                <TouchableOpacity 
+                  style={[styles.activityCard, { backgroundColor: category.backgroundColor }]}
+                  onPress={() => handleCardPress(category)}
                 >
-                  <StaggeredCategoryCard 
-                    category={category} 
-                    onPress={category.onPress}
-                  />
-                </Animatable.View>
-              ))}
-            </View>
-
-            {/* Right Column */}
-            <View style={styles.column}>
-              {rightColumn.map((category, index) => (
-                <Animatable.View
-                  key={category.id}
-                  animation="fadeInUp"
-                  delay={400 + (index * 100)}
-                  duration={500}
-                  style={styles.cardWrapper}
-                >
-                  <StaggeredCategoryCard 
-                    category={category} 
-                    onPress={category.onPress}
-                  />
-                </Animatable.View>
-              ))}
-            </View>
+                  <View style={styles.iconCircle}>
+                    {category.icon}
+                  </View>
+                  <View style={styles.cardTextContent}>
+                    <Text style={styles.cardTitle}>{category.title}</Text>
+                    <Text style={styles.cardDescription}>{category.description}</Text>
+                  </View>
+                </TouchableOpacity>
+              </Animatable.View>
+            ))}
           </View>
         </ScrollView>
       </ImageBackground>
     </SafeAreaView>
-  );
-};
-
-// Custom component for staggered cards
-const StaggeredCategoryCard = ({ category, onPress }) => {
-  return (
-    <TouchableOpacity 
-      style={[styles.staggeredCard, { height: category.height, backgroundColor: category.backgroundColor }]}
-      onPress={onPress || category.onPress}
-    >
-      <Animatable.View 
-        animation="pulse" 
-        iterationCount="infinite" 
-        duration={2000}
-        style={styles.iconContainer}
-      >
-        <View style={styles.iconCircle}>
-          {category.icon}
-        </View>
-      </Animatable.View>
-      
-      <View style={styles.textContainer}>
-        <Text style={styles.cardTitle}>{category.title}</Text>
-        <Text style={styles.cardDescription}>{category.description}</Text>
-      </View>
-    </TouchableOpacity>
   );
 };
 
@@ -206,22 +140,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: SIZES.screenPadding,
     paddingTop: SIZES.spacing.xl,
     paddingBottom: SIZES.spacing.m,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  headerContent: {
-    flex: 1,
-  },
-  decoration: {
-    flexDirection: 'row',
     position: 'relative',
-    width: 50,
-    height: 30,
-    marginRight: 10,
   },
   star: {
     position: 'absolute',
+    top: SIZES.spacing.xl,
+    right: SIZES.screenPadding,
   },
   title: {
     fontSize: SIZES.xxlarge,
@@ -233,60 +157,45 @@ const styles = StyleSheet.create({
     fontSize: SIZES.medium,
     color: COLORS.textLight,
   },
-  scrollView: {
-    flex: 1,
-  },
   scrollViewContent: {
-    paddingBottom: 100, // Extra padding at bottom to account for tab bar
     paddingHorizontal: SIZES.screenPadding,
+    paddingBottom: 100, // Extra padding at bottom to account for tab bar
   },
-  staggeredGrid: {
+  cardsGrid: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     justifyContent: 'space-between',
   },
-  column: {
-    width: COLUMN_WIDTH,
-  },
-  cardWrapper: {
-    marginBottom: SPACING,
-  },
-  staggeredCard: {
-    width: '100%',
-    borderRadius: SIZES.cardRadius,
-    padding: SIZES.spacing.m,
+  activityCard: {
+    width: CARD_WIDTH,
+    borderRadius: 16,
+    padding: SIZES.medium,
+    marginBottom: 16,
     ...SHADOWS.medium,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 0.5,
-    borderColor: 'rgba(255,255,255,0.2)',
-  },
-  iconContainer: {
-    alignItems: 'center',
-    marginBottom: SIZES.spacing.s,
   },
   iconCircle: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: 'rgba(255,255,255,0.3)',
+    width: 70,
+    height: 70,
+    borderRadius: 35,
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
     justifyContent: 'center',
     alignItems: 'center',
-    ...SHADOWS.small,
+    marginBottom: 15,
+    alignSelf: 'center',
   },
-  textContainer: {
+  cardTextContent: {
     alignItems: 'center',
-    padding: 4,
   },
   cardTitle: {
     fontSize: SIZES.medium,
     fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 6,
+    color: COLORS.text,
     textAlign: 'center',
+    marginBottom: 5,
   },
   cardDescription: {
     fontSize: SIZES.small,
-    color: '#555',
+    color: '#333',
     textAlign: 'center',
   }
 });

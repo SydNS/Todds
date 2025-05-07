@@ -5,17 +5,23 @@ import { useAuth } from '../context/AuthContext';
 
 // Import screens
 import SplashScreen from '../screens/SplashScreen';
+import AlphabetAdventureScreen from '../screens/alphabetadventure/AlphabetAdventureScreen';
+import AnimalSoundsScreen from '../screens/animalsounds/AnimalSoundsScreen';
 import ForgotPasswordScreen from '../screens/auth/ForgotPasswordScreen';
 import LoginScreen from '../screens/auth/LoginScreen';
 import SignupScreen from '../screens/auth/SignupScreen';
 import { BookReaderScreen, BooksScreen } from '../screens/books';
 import ChallengeDetailScreen from '../screens/challenges/ChallengeDetailScreen';
 import ChallengesScreen from '../screens/challenges/ChallengesScreen';
+import ColorQuestScreen from '../screens/colorquest/ColorQuestScreen';
+import DrawAndTellScreen from '../screens/drawandtell/DrawAndTellScreen';
 import LearnPhonicsScreen from '../screens/learnphonics/LearnPhonicsScreen';
+import MemoryMixScreen from '../screens/memorymix/MemoryMixScreen';
 import OnboardingScreen from '../screens/onboarding/OnboardingScreen';
 import PuzzlesGamesScreen from '../screens/puzzlesgames/PuzzlesGamesScreen';
 import ReadStoryScreen from '../screens/readstory/ReadStoryScreen';
 import SingWithUsScreen from '../screens/singwithus/SingWithUsScreen';
+import SoundItOutScreen from '../screens/sounditout/SoundItOutScreen';
 import TodaysChallengeScreen from '../screens/todayschallenge/TodaysChallengeScreen';
 import WeeklyFavoritesScreen from '../screens/weeklyfavorites/WeeklyFavoritesScreen';
 
@@ -78,6 +84,14 @@ const Navigation = ({ onReady }) => {
             <Stack.Screen name="WeeklyFavorites" component={WeeklyFavoritesScreen} />
             <Stack.Screen name="Challenges" component={ChallengesScreen} />
             <Stack.Screen name="ChallengeDetail" component={ChallengeDetailScreen} />
+            
+            {/* Activity screens */}
+            <Stack.Screen name="AlphabetAdventure" component={AlphabetAdventureScreen} />
+            <Stack.Screen name="AnimalSounds" component={AnimalSoundsScreen} />
+            <Stack.Screen name="ColorQuest" component={ColorQuestScreen} />
+            <Stack.Screen name="SoundItOut" component={SoundItOutScreen} />
+            <Stack.Screen name="MemoryMix" component={MemoryMixScreen} />
+            <Stack.Screen name="DrawAndTell" component={DrawAndTellScreen} />
             
             {/* Game screens */}
             <Stack.Screen name="LetterMatchingGame" component={LetterMatchingGame} />

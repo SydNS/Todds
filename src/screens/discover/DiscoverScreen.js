@@ -1,44 +1,61 @@
 import { FontAwesome5 } from '@expo/vector-icons';
 import React from 'react';
 import {
-    Image,
-    SafeAreaView,
-    ScrollView,
-    StatusBar,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Image,
+  SafeAreaView,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import { COLORS, SHADOWS, SIZES } from '../../constants/theme';
 
-const DiscoverScreen = () => {
+const DiscoverScreen = ({ navigation }) => {
+  // Updated discoverCategories with tiles from HomeScreen "Explore & Play" section
   const discoverCategories = [
     {
       id: '1',
-      title: 'Stories',
-      icon: <FontAwesome5 name="book" size={24} color={COLORS.storyWorld.primary} />,
-      color: COLORS.storyWorld.primary,
+      title: 'Read a Story',
+      icon: <FontAwesome5 name="book-open" size={24} color="#FFF" />,
+      backgroundColor: COLORS.storyWorld.primary,
+      screen: 'ReadStory',
     },
     {
       id: '2',
-      title: 'Songs',
-      icon: <FontAwesome5 name="music" size={24} color={COLORS.rhymeRhythm.primary} />,
-      color: COLORS.rhymeRhythm.primary,
+      title: 'Learn Phonics',
+      icon: <FontAwesome5 name="font" size={24} color="#FFF" />,
+      backgroundColor: COLORS.phonicsPlayground.primary,
+      screen: 'LearnPhonics',
     },
     {
       id: '3',
-      title: 'Games',
-      icon: <FontAwesome5 name="gamepad" size={24} color={COLORS.gameZone.primary} />,
-      color: COLORS.gameZone.primary,
+      title: 'Sing with Us',
+      icon: <FontAwesome5 name="music" size={24} color="#FFF" />,
+      backgroundColor: COLORS.rhymeRhythm.primary,
+      screen: 'SingWithUs',
     },
     {
       id: '4',
-      title: 'Videos',
-      icon: <FontAwesome5 name="video" size={24} color={COLORS.accent5} />,
-      color: COLORS.accent5,
+      title: 'Puzzles & Games',
+      icon: <FontAwesome5 name="puzzle-piece" size={24} color="#FFF" />,
+      backgroundColor: COLORS.gameZone.primary,
+      screen: 'PuzzlesGames',
+    },
+    {
+      id: '5',
+      title: 'This Week\'s Favorites',
+      icon: <FontAwesome5 name="star" size={24} color="#FFF" />,
+      backgroundColor: COLORS.accent1,
+      screen: 'WeeklyFavorites',
     },
   ];
+
+  // Handle category press
+  const handleCategoryPress = (category) => {
+    navigation.navigate(category.screen);
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -55,17 +72,20 @@ const DiscoverScreen = () => {
           <Text style={styles.searchPlaceholder}>Search for fun activities...</Text>
         </TouchableOpacity>
 
-        {/* Categories */}
+        {/* Categories - Using the style from HomeScreen's QuickAccessItem */}
         <View style={styles.categoriesContainer}>
           {discoverCategories.map((category) => (
             <TouchableOpacity 
               key={category.id}
-              style={[styles.categoryCard, { borderColor: category.color }]}
+              style={[styles.categoryCard, { backgroundColor: category.backgroundColor }]}
+              onPress={() => handleCategoryPress(category)}
             >
-              <View style={[styles.categoryIconContainer, { backgroundColor: category.color }]}>
-                {category.icon}
+              <View style={styles.categoryContent}>
+                <View style={styles.categoryIconContainer}>
+                  {category.icon}
+                </View>
+                <Text style={styles.categoryTitle}>{category.title}</Text>
               </View>
-              <Text style={styles.categoryTitle}>{category.title}</Text>
             </TouchableOpacity>
           ))}
         </View>
@@ -170,26 +190,28 @@ const styles = StyleSheet.create({
   categoryCard: {
     width: '48%',
     borderRadius: SIZES.borderRadius,
-    backgroundColor: COLORS.background,
+    overflow: 'hidden',
+    marginBottom: 12,
+    ...SHADOWS.medium,
+  },
+  categoryContent: {
     padding: SIZES.medium,
-    marginBottom: SIZES.medium,
     alignItems: 'center',
-    borderWidth: 2,
-    ...SHADOWS.small,
   },
   categoryIconContainer: {
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: COLORS.accent1,
+    backgroundColor: 'rgba(255,255,255,0.2)',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: SIZES.medium,
+    marginBottom: 10,
   },
   categoryTitle: {
-    fontSize: SIZES.medium,
+    color: '#FFF',
     fontWeight: '600',
-    color: COLORS.text,
+    fontSize: SIZES.medium,
+    textAlign: 'center',
   },
   sectionContainer: {
     marginBottom: SIZES.xlarge,
@@ -255,20 +277,20 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 10,
     right: 10,
-    backgroundColor: COLORS.error,
-    paddingVertical: 3,
-    paddingHorizontal: 6,
+    backgroundColor: COLORS.accent5,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
     borderRadius: 10,
   },
   comingSoonBadgeText: {
     color: '#FFF',
-    fontSize: 10,
+    fontSize: SIZES.small,
     fontWeight: 'bold',
   },
   comingSoonIconContainer: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
+    width: 50,
+    height: 50,
+    borderRadius: 25,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: SIZES.medium,
