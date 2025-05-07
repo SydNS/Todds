@@ -1,5 +1,5 @@
 import { FontAwesome5 } from '@expo/vector-icons';
-import React, { useContext, useState } from 'react';
+import React, { useContext } from 'react';
 import {
   Image,
   SafeAreaView,
@@ -16,16 +16,12 @@ import { useAuth } from '../../context/AuthContext';
 import ChallengeContext from '../../context/ChallengeContext';
 
 const MyCornerScreen = ({ navigation }) => {
-  const { userInfo } = useAuth();
+  const { userInfo, childInfo } = useAuth();
   const challengeContext = useContext(ChallengeContext);
   
   // Get achievements and challenges safely
   const achievements = challengeContext?.achievements || [];
   const getChallengesWithStatus = challengeContext?.getChallengesWithStatus || (() => []);
-  
-  const [childName] = useState('Sheena');
-  const [childAge] = useState('4 years');
-  const [childClass] = useState('Pre-K');
   
   // Get all challenges with their completion status
   const challenges = getChallengesWithStatus();
@@ -119,11 +115,13 @@ const MyCornerScreen = ({ navigation }) => {
             duration={800}
             style={styles.childInfoCard}
           >
-            <Text style={styles.childName}>{childName}</Text>
+            <Text style={styles.childName}>{childInfo?.name || 'Child'}</Text>
             <View style={styles.childMetaRow}>
-              <Text style={styles.childMeta}>{childAge}</Text>
+              <Text style={styles.childMeta}>{childInfo?.age || 'Age not set'}</Text>
               <View style={styles.metaDivider} />
-              <Text style={styles.childMeta}>{childClass}</Text>
+              <Text style={styles.childMeta}>{childInfo?.gender || 'Gender not set'}</Text>
+              <View style={styles.metaDivider} />
+              <Text style={styles.childMeta}>{childInfo?.grade || 'Grade not set'}</Text>
               <View style={styles.emojiContainer}>
                 <Text style={styles.emoji}>🥳</Text>
               </View>

@@ -1,18 +1,18 @@
 import React, { useState } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  TouchableOpacity, 
-  KeyboardAvoidingView, 
-  Platform,
-  ScrollView,
-  SafeAreaView
+import {
+    KeyboardAvoidingView,
+    Platform,
+    SafeAreaView,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View
 } from 'react-native';
-import { COLORS, SIZES } from '../../constants/theme';
-import { useAuth } from '../../context/AuthContext';
 import Button from '../../components/Button';
 import TextInput from '../../components/TextInput';
+import { COLORS, SIZES } from '../../constants/theme';
+import { useAuth } from '../../context/AuthContext';
 
 const SignupScreen = ({ navigation }) => {
   const { register } = useAuth();
@@ -20,6 +20,13 @@ const SignupScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  
+  // Child specific details
+  const [childName, setChildName] = useState('');
+  const [childAge, setChildAge] = useState('');
+  const [childGender, setChildGender] = useState('');
+  const [childGrade, setChildGrade] = useState('');
+  
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
@@ -38,7 +45,12 @@ const SignupScreen = ({ navigation }) => {
 
     // Validate inputs
     if (!name || !email || !password || !confirmPassword) {
-      setError('Please fill in all fields');
+      setError('Please fill in all parent fields');
+      return;
+    }
+
+    if (!childName || !childAge || !childGender || !childGrade) {
+      setError('Please fill in all child details');
       return;
     }
 
@@ -60,7 +72,13 @@ const SignupScreen = ({ navigation }) => {
     setIsLoading(true);
 
     try {
-      const result = await register(name, email, password);
+      const result = await register(name, email, password, {
+        childName,
+        childAge,
+        childGender,
+        childGrade
+      });
+      
       if (!result.success) {
         setError(result.error);
       }
@@ -89,9 +107,11 @@ const SignupScreen = ({ navigation }) => {
           <View style={styles.formContainer}>
             {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
+            <Text style={styles.sectionTitle}>Parent Information</Text>
+
             <TextInput
               label="Full Name"
-              placeholder="Enter your full name"
+              placeholder="Enter parent's full name"
               value={name}
               onChangeText={setName}
               autoCapitalize="words"
@@ -120,6 +140,40 @@ const SignupScreen = ({ navigation }) => {
               value={confirmPassword}
               onChangeText={setConfirmPassword}
               secureTextEntry
+            />
+            
+            <Text style={styles.sectionTitle}>Child Information</Text>
+            
+            <TextInput
+              label="Child's Name"
+              placeholder="Enter child's name"
+              value={childName}
+              onChangeText={setChildName}
+              autoCapitalize="words"
+            />
+            
+            <TextInput
+              label="Age"
+              placeholder="Enter child's age (e.g., 4 years)"
+              value={childAge}
+              onChangeText={setChildAge}
+              keyboardType="number-pad"
+            />
+            
+            <TextInput
+              label="Gender"
+              placeholder="Enter child's gender"
+              value={childGender}
+              onChangeText={setChildGender}
+              autoCapitalize="words"
+            />
+            
+            <TextInput
+              label="Grade/Class"
+              placeholder="Enter child's grade or class (e.g., Pre-K)"
+              value={childGrade}
+              onChangeText={setChildGrade}
+              autoCapitalize="words"
             />
 
             <Button
@@ -176,6 +230,13 @@ const styles = StyleSheet.create({
   },
   formContainer: {
     width: '100%',
+  },
+  sectionTitle: {
+    fontSize: SIZES.large,
+    fontWeight: 'bold',
+    color: COLORS.primary,
+    marginTop: SIZES.medium,
+    marginBottom: SIZES.medium,
   },
   errorText: {
     color: COLORS.error,

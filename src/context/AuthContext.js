@@ -1,5 +1,5 @@
-import React, { createContext, useState, useEffect, useContext } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 
 // Create context
 const AuthContext = createContext();
@@ -8,6 +8,7 @@ export const AuthProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [userToken, setUserToken] = useState(null);
   const [userInfo, setUserInfo] = useState(null);
+  const [childInfo, setChildInfo] = useState(null);
   const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(false);
 
   useEffect(() => {
@@ -29,10 +30,15 @@ export const AuthProvider = ({ children }) => {
         // Load token from storage
         const storedToken = await AsyncStorage.getItem('userToken');
         const storedUserInfo = await AsyncStorage.getItem('userInfo');
+        const storedChildInfo = await AsyncStorage.getItem('childInfo');
         
         if (storedToken && storedUserInfo) {
           setUserToken(storedToken);
           setUserInfo(JSON.parse(storedUserInfo));
+          
+          if (storedChildInfo) {
+            setChildInfo(JSON.parse(storedChildInfo));
+          }
         }
       } catch (error) {
         console.log('Error checking auth state:', error);
@@ -70,12 +76,30 @@ export const AuthProvider = ({ children }) => {
       
       const mockToken = 'sample-jwt-token-' + Math.random().toString(36).substring(2, 15);
       
+      // Retrieve stored child info if any (in a real app this would come from the backend)
+      const storedChildInfo = await AsyncStorage.getItem('childInfo');
+      let childInfoData = null;
+      
+      if (storedChildInfo) {
+        childInfoData = JSON.parse(storedChildInfo);
+      } else {
+        // Sample child data if none exists
+        childInfoData = {
+          name: 'Demo Child',
+          age: '4 years',
+          gender: 'Female',
+          grade: 'Pre-K'
+        };
+        await AsyncStorage.setItem('childInfo', JSON.stringify(childInfoData));
+      }
+      
       // Store auth data
       await AsyncStorage.setItem('userToken', mockToken);
       await AsyncStorage.setItem('userInfo', JSON.stringify(mockUserInfo));
       
       // Update state
       setUserInfo(mockUserInfo);
+      setChildInfo(childInfoData);
       setUserToken(mockToken);
       return { success: true };
     } catch (error) {
@@ -86,7 +110,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   // Register
-  const register = async (name, email, password) => {
+  const register = async (name, email, password, childDetails) => {
     setIsLoading(true);
     try {
       // For MVP, we'll mock the API call
@@ -99,12 +123,22 @@ export const AuthProvider = ({ children }) => {
       
       const mockToken = 'sample-jwt-token-' + Math.random().toString(36).substring(2, 15);
       
+      // Format child information
+      const childInfoData = {
+        name: childDetails.childName,
+        age: childDetails.childAge,
+        gender: childDetails.childGender,
+        grade: childDetails.childGrade
+      };
+      
       // Store auth data
       await AsyncStorage.setItem('userToken', mockToken);
       await AsyncStorage.setItem('userInfo', JSON.stringify(mockUserInfo));
+      await AsyncStorage.setItem('childInfo', JSON.stringify(childInfoData));
       
       // Update state
       setUserInfo(mockUserInfo);
+      setChildInfo(childInfoData);
       setUserToken(mockToken);
       return { success: true };
     } catch (error) {
@@ -118,13 +152,13 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     setIsLoading(true);
     try {
-      // Remove auth data
+      // In a real app, you might want to make an API call to invalidate the token
       await AsyncStorage.removeItem('userToken');
       await AsyncStorage.removeItem('userInfo');
+      // We're not removing child info to persist it between sessions
       
-      // Update state
-      setUserInfo(null);
       setUserToken(null);
+      setUserInfo(null);
     } catch (error) {
       console.log('Error logging out:', error);
     } finally {
@@ -132,41 +166,40 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Reset password (mock implementation)
-  const resetPassword = async (email) => {
-    setIsLoading(true);
+  // Update Child Info
+  const updateChildInfo = async (updatedChildInfo) => {
     try {
-      // Mock API call
-      // In a real app, this would send a reset email
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate network delay
-      return { success: true, message: 'Password reset email sent. Please check your inbox.' };
+      const newChildInfo = { ...childInfo, ...updatedChildInfo };
+      await AsyncStorage.setItem('childInfo', JSON.stringify(newChildInfo));
+      setChildInfo(newChildInfo);
+      return { success: true };
     } catch (error) {
-      return { success: false, error: 'Failed to send reset email. Please try again.' };
-    } finally {
-      setIsLoading(false);
+      console.log('Error updating child info:', error);
+      return { success: false, error: 'Failed to update child information.' };
     }
   };
 
-  const authContext = {
-    isLoading,
-    userToken,
-    userInfo,
-    hasCompletedOnboarding,
-    login,
-    logout,
-    register,
-    resetPassword,
-    completeOnboarding,
-  };
-
   return (
-    <AuthContext.Provider value={authContext}>
+    <AuthContext.Provider
+      value={{
+        isLoading,
+        userToken,
+        userInfo,
+        childInfo,
+        hasCompletedOnboarding,
+        login,
+        logout,
+        register,
+        completeOnboarding,
+        updateChildInfo
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
 };
 
-// Custom hook to use auth context
+// Custom hook to use the auth context
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
