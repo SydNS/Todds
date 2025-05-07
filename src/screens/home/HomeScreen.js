@@ -1,5 +1,4 @@
 import { FontAwesome5 } from '@expo/vector-icons';
-import { Video as ExpoVideo, useVideoPlayer, VideoView } from 'expo-video';
 import React, { useEffect, useRef, useState } from 'react';
 import {
   Animated,
@@ -16,6 +15,7 @@ import {
   View,
 } from 'react-native';
 import * as Animatable from 'react-native-animatable';
+import { WebView } from 'react-native-webview';
 import { COLORS, SHADOWS, SIZES } from '../../constants/theme';
 import { useAuth } from '../../context/AuthContext';
 
@@ -27,60 +27,16 @@ const SPACING = 10;
 const VideoCarousel = ({ data }) => {
   const [selectedVideo, setSelectedVideo] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
-  const [useExpoAV, setUseExpoAV] = useState(false);
-  const videoRef = useRef(null);
-  
-  // Create the player at the top level with null initial source
-  const player = useVideoPlayer(null);
 
   const closeModal = () => {
     setModalVisible(false);
-    if (player && !useExpoAV) {
-      player.pause();
-    }
-    if (videoRef.current && useExpoAV) {
-      videoRef.current.pauseAsync();
-    }
   };
 
   const handleVideoPress = (video) => {
+    console.log("Video pressed:", video.title);
     setSelectedVideo(video);
-    try {
-      // Try to use expo-video first
-      if (player && !useExpoAV) {
-        console.log("Loading video with expo-video:", video.url);
-        player.replaceAsync(video.url)
-          .then(() => {
-            console.log("Playing video");
-            player.play();
-          })
-          .catch(error => {
-            console.error("Error playing video with expo-video:", error);
-            setUseExpoAV(true);
-          });
-      }
-      setModalVisible(true);
-    } catch (error) {
-      console.error("Error in handleVideoPress:", error);
-      // Fall back to ExpoAV
-      setUseExpoAV(true);
-      setModalVisible(true);
-    }
+    setModalVisible(true);
   };
-
-  useEffect(() => {
-    // Load the video using expo-video when modal is opened with useExpoAV
-    if (modalVisible && useExpoAV && videoRef.current && selectedVideo) {
-      console.log("Loading video with expo-av:", selectedVideo.url);
-      try {
-        videoRef.current.loadAsync({ uri: selectedVideo.url }, {}, false)
-          .then(() => videoRef.current.playAsync())
-          .catch(error => console.error("Error loading video with expo-av:", error));
-      } catch (error) {
-        console.error("Error in useEffect loading video:", error);
-      }
-    }
-  }, [modalVisible, useExpoAV, selectedVideo]);
 
   return (
     <View style={styles.carouselContainer}>
@@ -125,28 +81,17 @@ const VideoCarousel = ({ data }) => {
               <FontAwesome5 name="times" size={20} color="#FFF" />
             </TouchableOpacity>
             
-            {selectedVideo && !useExpoAV && player && (
+            {selectedVideo && (
               <View style={styles.videoWrapper}>
-                <VideoView
-                  player={player}
-                  style={styles.video}
-                  nativeControls
-                />
-                <Text style={styles.videoTitle}>{selectedVideo.title}</Text>
-              </View>
-            )}
-
-            {selectedVideo && useExpoAV && (
-              <View style={styles.videoWrapper}>
-                <ExpoVideo
-                  ref={videoRef}
-                  style={styles.video}
-                  useNativeControls
-                  resizeMode="contain"
-                  isLooping
-                  onError={(error) => {
-                    console.error("Expo Video error:", error);
+                <WebView
+                  source={{ 
+                    uri: `https://www.youtube.com/embed/${selectedVideo.youtubeId}?rel=0&autoplay=1&playsinline=1` 
                   }}
+                  style={styles.video}
+                  allowsFullscreenVideo
+                  mediaPlaybackRequiresUserAction={false}
+                  javaScriptEnabled={true}
+                  domStorageEnabled={true}
                 />
                 <Text style={styles.videoTitle}>{selectedVideo.title}</Text>
               </View>
@@ -234,35 +179,35 @@ const QuickAccessItem = ({ item, index, onPress }) => {
 const HomeScreen = ({ navigation }) => {
   const { userInfo } = useAuth();
   
-  // Updated video data with direct video URLs
+  // Updated video data with YouTube videos from the specified playlist
   const videoData = [
     {
       id: '1',
-      title: 'ABC Song - Learn English Alphabet for Children',
-      thumbnail: 'https://i.ytimg.com/vi/75p-N9YKqNo/maxresdefault.jpg',
+      title: 'ABC Song for Children - Learn the Alphabet',
+      thumbnail: 'https://img.youtube.com/vi/75p-N9YKqNo/maxresdefault.jpg',
       duration: '2:32',
-      url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4', // Updated to a sample video that should work
+      youtubeId: '75p-N9YKqNo'
     },
     {
       id: '2',
-      title: 'Numbers Song 1-10',
-      thumbnail: 'https://i.ytimg.com/vi/DR-cfDsHCGA/maxresdefault.jpg',
+      title: 'Numbers Song 1-10 | Counting Numbers for Kids',
+      thumbnail: 'https://img.youtube.com/vi/DR-cfDsHCGA/maxresdefault.jpg',
       duration: '2:48',
-      url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4', // Updated to a sample video that should work
+      youtubeId: 'DR-cfDsHCGA'
     },
     {
       id: '3',
-      title: 'Phonics Song with Two Words',
-      thumbnail: 'https://i.ytimg.com/vi/BELlZKpi1Zs/maxresdefault.jpg',
+      title: 'Phonics Song with Two Words | Alphabet Learning',
+      thumbnail: 'https://img.youtube.com/vi/BELlZKpi1Zs/maxresdefault.jpg',
       duration: '2:38',
-      url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4', // Updated to a sample video that should work
+      youtubeId: 'BELlZKpi1Zs'
     },
     {
       id: '4',
-      title: 'Colors Song for Kids',
-      thumbnail: 'https://i.ytimg.com/vi/_mVE4BJp8Zw/maxresdefault.jpg',
+      title: 'Colors Song for Kids | Learning Colors',
+      thumbnail: 'https://img.youtube.com/vi/_mVE4BJp8Zw/maxresdefault.jpg',
       duration: '3:05',
-      url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4', // Updated to a sample video that should work
+      youtubeId: '_mVE4BJp8Zw'
     },
   ];
   

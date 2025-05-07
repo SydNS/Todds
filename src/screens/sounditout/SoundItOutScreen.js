@@ -2,6 +2,7 @@ import { FontAwesome5, MaterialIcons } from '@expo/vector-icons';
 import { Audio } from 'expo-av';
 import React, { useEffect, useState } from 'react';
 import {
+  Alert,
   Dimensions,
   Image,
   SafeAreaView,
@@ -24,6 +25,27 @@ const SoundItOutScreen = ({ navigation }) => {
   const [score, setScore] = useState(0);
   const [sound, setSound] = useState(null);
 
+  // Request audio permissions when component mounts
+  useEffect(() => {
+    (async () => {
+      try {
+        console.log("Requesting audio permissions...");
+        const permission = await Audio.requestPermissionsAsync();
+        console.log("Permission response:", permission);
+        
+        if (permission.status !== 'granted') {
+          Alert.alert(
+            'Permission Required',
+            'Audio playback requires microphone permission',
+            [{ text: 'OK' }]
+          );
+        }
+      } catch (error) {
+        console.error("Error requesting permissions:", error);
+      }
+    })();
+  }, []);
+
   // Cleanup sound on unmount
   useEffect(() => {
     return () => {
@@ -39,7 +61,7 @@ const SoundItOutScreen = ({ navigation }) => {
       id: '1',
       targetSound: 'B',
       targetWord: 'Ball',
-      soundFile: require('../../../assets/sounds/b_sound.mp3'),
+      audioUrl: 'https://assets.mixkit.co/sfx/preview/mixkit-cartoon-toy-whistle-616.mp3',
       targetImage: 'https://cdn-icons-png.flaticon.com/512/3097/3097648.png',
       options: ['B', 'D', 'P', 'T'],
       correctOption: 'B',
@@ -48,7 +70,7 @@ const SoundItOutScreen = ({ navigation }) => {
       id: '2',
       targetSound: 'S',
       targetWord: 'Snake',
-      soundFile: require('../../../assets/sounds/s_sound.mp3'),
+      audioUrl: 'https://assets.mixkit.co/sfx/preview/mixkit-cinematic-fairy-water-splashes-538.mp3',
       targetImage: 'https://cdn-icons-png.flaticon.com/512/3097/3097795.png',
       options: ['S', 'Z', 'C', 'F'],
       correctOption: 'S',
@@ -57,7 +79,7 @@ const SoundItOutScreen = ({ navigation }) => {
       id: '3',
       targetSound: 'M',
       targetWord: 'Mouse',
-      soundFile: require('../../../assets/sounds/m_sound.mp3'),
+      audioUrl: 'https://assets.mixkit.co/sfx/preview/mixkit-cartoon-falling-whistle-395.mp3',
       targetImage: 'https://cdn-icons-png.flaticon.com/512/3097/3097878.png',
       options: ['M', 'N', 'W', 'V'],
       correctOption: 'M',
@@ -66,7 +88,7 @@ const SoundItOutScreen = ({ navigation }) => {
       id: '4',
       targetSound: 'C',
       targetWord: 'Cat',
-      soundFile: require('../../../assets/sounds/c_sound.mp3'),
+      audioUrl: 'https://assets.mixkit.co/sfx/preview/mixkit-cat-meow-mammal-4520.mp3',
       targetImage: 'https://cdn-icons-png.flaticon.com/512/3097/3097877.png',
       options: ['C', 'K', 'G', 'Q'],
       correctOption: 'C',
@@ -100,27 +122,51 @@ const SoundItOutScreen = ({ navigation }) => {
   };
   
   async function playSound() {
-    const currentSound = levels[currentLevel].soundFile;
-    console.log('Loading Sound for:', levels[currentLevel].targetSound);
+    const currentSound = levels[currentLevel];
+    console.log('Attempting to play sound for:', currentSound.targetSound);
     
     try {
-      // Unload the previous sound if exists
+      // Unload the previous sound if it exists
       if (sound) {
         await sound.unloadAsync();
       }
       
-      // Create new sound instance
-      const { sound: newSound } = await Audio.Sound.createAsync(currentSound);
+      // Set up audio mode
+      await Audio.setAudioModeAsync({
+        allowsRecordingIOS: false,
+        staysActiveInBackground: false,
+        playsInSilentModeIOS: true,
+        shouldDuckAndroid: true,
+        playThroughEarpieceAndroid: false,
+      });
+      
+      console.log('Loading sound from URL:', currentSound.audioUrl);
+      
+      // Create new sound instance from URL
+      const { sound: newSound } = await Audio.Sound.createAsync(
+        { uri: currentSound.audioUrl },
+        { shouldPlay: true, volume: 1.0 }
+      );
+      
       setSound(newSound);
       
-      console.log('Playing Sound');
-      await newSound.playAsync();
+      // Monitor playback status
+      newSound.setOnPlaybackStatusUpdate((status) => {
+        console.log('Playback status:', status.isPlaying ? 'Playing' : 'Stopped');
+        
+        if (status.didJustFinish) {
+          console.log('Sound finished playing');
+        }
+      });
+      
     } catch (error) {
       console.error('Error playing sound:', error);
+      Alert.alert('Sound Error', 'There was a problem playing the sound.');
     }
   }
   
   const handlePlaySound = () => {
+    console.log('Play sound button pressed');
     // Play the current target letter sound
     playSound();
   };

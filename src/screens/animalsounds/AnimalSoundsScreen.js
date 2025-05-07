@@ -2,6 +2,7 @@ import { FontAwesome5 } from '@expo/vector-icons';
 import { Audio } from 'expo-av';
 import React, { useEffect, useState } from 'react';
 import {
+  Alert,
   Dimensions,
   Image,
   SafeAreaView,
@@ -22,6 +23,27 @@ const AnimalSoundsScreen = ({ navigation }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [sound, setSound] = useState(null);
   
+  // Request audio permissions when component mounts
+  useEffect(() => {
+    (async () => {
+      try {
+        console.log("Requesting audio permissions...");
+        const permission = await Audio.requestPermissionsAsync();
+        console.log("Permission response:", permission);
+        
+        if (permission.status !== 'granted') {
+          Alert.alert(
+            'Permission Required',
+            'Audio playback requires microphone permission',
+            [{ text: 'OK' }]
+          );
+        }
+      } catch (error) {
+        console.error("Error requesting permissions:", error);
+      }
+    })();
+  }, []);
+  
   // Cleanup sound on unmount
   useEffect(() => {
     return () => {
@@ -32,83 +54,102 @@ const AnimalSoundsScreen = ({ navigation }) => {
     };
   }, [sound]);
   
+  // Updated animal data with local static sound files
   const animals = [
     {
       id: '1',
       name: 'Lion',
       sound: 'Roar',
-      soundFile: require('../../../assets/sounds/lion.mp3'),
+      audioUrl: 'https://assets.mixkit.co/sfx/preview/mixkit-lion-roar-big-cat-13.mp3',
       image: 'https://cdn-icons-png.flaticon.com/512/2219/2219774.png'
     },
     {
       id: '2',
       name: 'Cow',
       sound: 'Moo',
-      soundFile: require('../../../assets/sounds/cow.mp3'),
+      audioUrl: 'https://assets.mixkit.co/sfx/preview/mixkit-cow-moo-1747.mp3',
       image: 'https://cdn-icons-png.flaticon.com/512/2219/2219673.png'
     },
     {
       id: '3',
       name: 'Dog',
       sound: 'Woof',
-      soundFile: require('../../../assets/sounds/dog.mp3'),
+      audioUrl: 'https://assets.mixkit.co/sfx/preview/mixkit-dog-barking-twice-1.mp3',
       image: 'https://cdn-icons-png.flaticon.com/512/2219/2219661.png'
     },
     {
       id: '4',
       name: 'Cat',
       sound: 'Meow',
-      soundFile: require('../../../assets/sounds/cat.mp3'),
+      audioUrl: 'https://assets.mixkit.co/sfx/preview/mixkit-domestic-cat-hungry-meow-45.mp3',
       image: 'https://cdn-icons-png.flaticon.com/512/2219/2219673.png'
     },
     {
       id: '5',
       name: 'Sheep',
       sound: 'Baa',
-      soundFile: require('../../../assets/sounds/sheep.mp3'),
+      audioUrl: 'https://assets.mixkit.co/sfx/preview/mixkit-sheep-bleat-1740.mp3',
       image: 'https://cdn-icons-png.flaticon.com/512/2219/2219759.png'
     },
     {
       id: '6',
       name: 'Horse',
       sound: 'Neigh',
-      soundFile: require('../../../assets/sounds/horse.mp3'),
+      audioUrl: 'https://assets.mixkit.co/sfx/preview/mixkit-horse-neighs-and-blows-719.mp3',
       image: 'https://cdn-icons-png.flaticon.com/512/2219/2219719.png'
     },
   ];
   
   async function playSound(animal) {
-    console.log('Loading Sound');
+    console.log('Attempting to load sound for:', animal.name);
+    
     try {
-      // Unload the previous sound if exists
+      // Unload the previous sound if it exists
       if (sound) {
         await sound.unloadAsync();
       }
       
-      // Create new sound instance
-      const { sound: newSound } = await Audio.Sound.createAsync(animal.soundFile);
+      // Set up audio mode for playback
+      await Audio.setAudioModeAsync({
+        allowsRecordingIOS: false,
+        staysActiveInBackground: false,
+        playsInSilentModeIOS: true,
+        shouldDuckAndroid: true,
+        playThroughEarpieceAndroid: false,
+      });
+      
+      console.log('Loading sound from URL:', animal.audioUrl);
+      
+      // Create and load new sound from URL instead of local file
+      const { sound: newSound } = await Audio.Sound.createAsync(
+        { uri: animal.audioUrl },
+        { shouldPlay: true, volume: 1.0 }
+      );
+      
       setSound(newSound);
-      
-      console.log('Playing Sound');
-      await newSound.playAsync();
-      
-      // Set playing state for UI animation
       setIsPlaying(true);
       
-      // Reset playing state after sound duration
+      // Monitor playback status
       newSound.setOnPlaybackStatusUpdate((status) => {
+        console.log('Playback status:', status.isPlaying ? 'Playing' : 'Stopped');
+        
         if (status.didJustFinish) {
+          console.log('Sound finished playing');
           setIsPlaying(false);
         }
       });
+      
     } catch (error) {
       console.error('Error playing sound:', error);
+      Alert.alert('Sound Error', 'There was a problem playing the animal sound.');
       setIsPlaying(false);
     }
   }
   
   const handleAnimalPress = (animal) => {
+    console.log('Animal pressed:', animal.name);
     setSelectedAnimal(animal);
+    
     // Play the animal sound
     playSound(animal);
   };
