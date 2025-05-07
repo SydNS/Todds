@@ -1,158 +1,317 @@
-import React from 'react';
+import { FontAwesome5 } from '@expo/vector-icons';
+import { useVideoPlayer, VideoView } from 'expo-video';
+import React, { useEffect, useRef, useState } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
+  Animated,
+  Dimensions,
+  FlatList,
   Image,
+  Modal,
   SafeAreaView,
+  ScrollView,
   StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
-import { COLORS, SIZES, SHADOWS } from '../../constants/theme';
+import * as Animatable from 'react-native-animatable';
+import { COLORS, SHADOWS, SIZES } from '../../constants/theme';
 import { useAuth } from '../../context/AuthContext';
 
-const HomeScreen = () => {
-  const { userInfo, logout } = useAuth();
+const { width } = Dimensions.get('window');
+const CARD_WIDTH = width * 0.8;
+const SPACING = 10;
 
-  // Learning categories
-  const categories = [
+// Carousel component for videos
+const VideoCarousel = ({ data }) => {
+  const [selectedVideo, setSelectedVideo] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false);
+  
+  // Create the player at the top level with null initial source
+  const player = useVideoPlayer(null);
+
+  const closeModal = () => {
+    setModalVisible(false);
+    if (player) {
+      player.pause();
+    }
+  };
+
+  const handleVideoPress = (video) => {
+    setSelectedVideo(video);
+    // Update the player source instead of creating a new one
+    if (player) {
+      player.replaceAsync(video.url)
+        .then(() => {
+          player.play();
+        });
+    }
+    setModalVisible(true);
+  };
+
+  return (
+    <View style={styles.carouselContainer}>
+      <Text style={styles.carouselTitle}>Watch & Learn</Text>
+      <FlatList
+        data={data}
+        keyExtractor={(item) => item.id}
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        snapToInterval={CARD_WIDTH + SPACING}
+        decelerationRate="fast"
+        contentContainerStyle={{ paddingHorizontal: SIZES.screenPadding }}
+        renderItem={({ item }) => (
+          <TouchableOpacity 
+            style={styles.carouselCard}
+            onPress={() => handleVideoPress(item)}
+          >
+            <Image source={{ uri: item.thumbnail }} style={styles.carouselImage} />
+            <View style={styles.cardOverlay}>
+              <View style={styles.playButton}>
+                <FontAwesome5 name="play" size={15} color="#FFF" />
+              </View>
+            </View>
+            <View style={styles.cardContent}>
+              <Text style={styles.cardTitle}>{item.title}</Text>
+              <Text style={styles.cardDuration}>{item.duration}</Text>
+            </View>
+          </TouchableOpacity>
+        )}
+      />
+
+      {/* Video Modal */}
+      <Modal
+        visible={modalVisible}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={closeModal}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.videoContainer}>
+            <TouchableOpacity style={styles.closeButton} onPress={closeModal}>
+              <FontAwesome5 name="times" size={20} color="#FFF" />
+            </TouchableOpacity>
+            
+            {selectedVideo && player && (
+              <View style={styles.videoWrapper}>
+                <VideoView
+                  player={player}
+                  style={styles.video}
+                  nativeControls
+                />
+                <Text style={styles.videoTitle}>{selectedVideo.title}</Text>
+              </View>
+            )}
+          </View>
+        </View>
+      </Modal>
+    </View>
+  );
+};
+
+// Today's Challenge component
+const TodaysChallenge = ({ onPress }) => {
+  const bounceAnim = useRef(new Animated.Value(1)).current;
+  
+  useEffect(() => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(bounceAnim, {
+          toValue: 1.05,
+          duration: 1000,
+          useNativeDriver: true,
+        }),
+        Animated.timing(bounceAnim, {
+          toValue: 1,
+          duration: 1000,
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
+  }, []);
+
+  return (
+    <Animatable.View 
+      animation="fadeInUp" 
+      duration={800} 
+      delay={300}
+      style={styles.challengeContainer}
+    >
+      <View style={styles.challengeHeader}>
+        <FontAwesome5 name="calendar-day" size={18} color={COLORS.accent1} />
+        <Text style={styles.challengeHeaderText}>Today's Challenge</Text>
+      </View>
+      <Text style={styles.challengeTitle}>Can you match the beginning sounds? 🧠</Text>
+      <Animated.View 
+        style={[
+          styles.startButtonContainer, 
+          { transform: [{ scale: bounceAnim }] }
+        ]}
+      >
+        <TouchableOpacity 
+          style={styles.startButton}
+          onPress={onPress}
+        >
+          <Text style={styles.startButtonText}>Start Challenge</Text>
+          <FontAwesome5 name="arrow-right" size={12} color="#FFF" style={styles.buttonIcon} />
+        </TouchableOpacity>
+      </Animated.View>
+    </Animatable.View>
+  );
+};
+
+// Staggered list item component
+const QuickAccessItem = ({ item, index, onPress }) => {
+  return (
+    <Animatable.View
+      animation="fadeInUp"
+      delay={index * 100}
+      duration={600}
+      style={[styles.quickAccessItem, { backgroundColor: item.backgroundColor }]}
+    >
+      <TouchableOpacity 
+        style={styles.quickAccessButton} 
+        onPress={() => onPress(item)}
+      >
+        <View style={styles.quickAccessIconContainer}>
+          {item.icon}
+        </View>
+        <Text style={styles.quickAccessText}>{item.title}</Text>
+      </TouchableOpacity>
+    </Animatable.View>
+  );
+};
+
+const HomeScreen = ({ navigation }) => {
+  const { userInfo } = useAuth();
+  
+  // Updated video data with direct video URLs
+  const videoData = [
     {
       id: '1',
-      title: 'Letters',
-      description: 'Learn the alphabet',
-      color: COLORS.accent1,
-      icon: '🔤',
+      title: 'ABC Song - Learn English Alphabet for Children',
+      thumbnail: 'https://i.ytimg.com/vi/75p-N9YKqNo/maxresdefault.jpg',
+      duration: '2:32',
+      url: 'https://assets.mixkit.co/videos/preview/mixkit-a-girl-blowing-a-bubble-gum-at-an-amusement-park-1226-large.mp4',
     },
     {
       id: '2',
-      title: 'Numbers',
-      description: 'Count and learn',
-      color: COLORS.accent2,
-      icon: '🔢',
+      title: 'Numbers Song 1-10',
+      thumbnail: 'https://i.ytimg.com/vi/DR-cfDsHCGA/maxresdefault.jpg',
+      duration: '2:48',
+      url: 'https://assets.mixkit.co/videos/preview/mixkit-little-girl-in-nature-with-a-marshmallow-on-a-twig-39766-large.mp4',
     },
     {
       id: '3',
-      title: 'Colors',
-      description: 'Explore colors',
-      color: COLORS.accent3,
-      icon: '🎨',
+      title: 'Phonics Song with Two Words',
+      thumbnail: 'https://i.ytimg.com/vi/BELlZKpi1Zs/maxresdefault.jpg',
+      duration: '2:38',
+      url: 'https://assets.mixkit.co/videos/preview/mixkit-mother-with-her-little-daughter-eating-a-marshmallow-in-nature-39764-large.mp4',
     },
     {
       id: '4',
-      title: 'Animals',
-      description: 'Discover animals',
-      color: COLORS.primary,
-      icon: '🦁',
+      title: 'Colors Song for Kids',
+      thumbnail: 'https://i.ytimg.com/vi/_mVE4BJp8Zw/maxresdefault.jpg',
+      duration: '3:05',
+      url: 'https://assets.mixkit.co/videos/preview/mixkit-girl-in-neon-sign-1232-large.mp4',
     },
   ];
-
-  // Recent activities
-  const recentActivities = [
+  
+  // Quick access items for staggered list
+  const quickAccessItems = [
     {
       id: '1',
-      title: 'Letter A',
-      category: 'Letters',
-      progress: '75%',
-      color: COLORS.accent1,
+      title: 'Read a Story',
+      icon: <FontAwesome5 name="book-open" size={24} color="#FFF" />,
+      backgroundColor: COLORS.storyWorld.primary,
+      screen: 'ReadStory',
     },
     {
       id: '2',
-      title: 'Numbers 1-5',
-      category: 'Numbers',
-      progress: '50%',
-      color: COLORS.accent2,
+      title: 'Learn Phonics',
+      icon: <FontAwesome5 name="font" size={24} color="#FFF" />,
+      backgroundColor: COLORS.phonicsPlayground.primary,
+      screen: 'LearnPhonics',
+    },
+    {
+      id: '3',
+      title: 'Sing with Us',
+      icon: <FontAwesome5 name="music" size={24} color="#FFF" />,
+      backgroundColor: COLORS.rhymeRhythm.primary,
+      screen: 'SingWithUs',
+    },
+    {
+      id: '4',
+      title: 'Puzzles & Games',
+      icon: <FontAwesome5 name="puzzle-piece" size={24} color="#FFF" />,
+      backgroundColor: COLORS.gameZone.primary,
+      screen: 'PuzzlesGames',
+    },
+    {
+      id: '5',
+      title: 'This Week\'s Favorites',
+      icon: <FontAwesome5 name="star" size={24} color="#FFF" />,
+      backgroundColor: COLORS.accent1,
+      screen: 'WeeklyFavorites',
     },
   ];
+
+  const handleChallenge = () => {
+    navigation.navigate('TodaysChallenge');
+  };
+
+  const handleQuickAccessPress = (item) => {
+    navigation.navigate(item.screen);
+  };
 
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor={COLORS.background} />
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-        {/* Header */}
-        <View style={styles.header}>
+      <ScrollView 
+        contentContainerStyle={styles.scrollContainer}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Header with welcome message and avatar */}
+        <Animatable.View 
+          animation="fadeIn" 
+          duration={600}
+          style={styles.header}
+        >
           <View>
-            <Text style={styles.greeting}>Hello, {userInfo?.name || 'Friend'}!</Text>
-            <Text style={styles.welcomeText}>Ready to learn something new today?</Text>
+            <Text style={styles.greeting}>Welcome back, {userInfo?.name || 'Friend'}!</Text>
+            <View style={styles.badgeContainer}>
+              <FontAwesome5 name="star" size={14} color={COLORS.accent1} />
+              <Text style={styles.badgeText}>3 lessons today!</Text>
+            </View>
           </View>
           <TouchableOpacity style={styles.profileButton}>
             <View style={styles.profileImageContainer}>
               <Text style={styles.profileInitial}>{(userInfo?.name || 'A').charAt(0)}</Text>
             </View>
           </TouchableOpacity>
-        </View>
+        </Animatable.View>
 
-        {/* Daily Challenge */}
-        <TouchableOpacity style={styles.dailyChallenge}>
-          <View style={styles.dailyChallengeContent}>
-            <View>
-              <Text style={styles.dailyChallengeLabel}>Today's Challenge</Text>
-              <Text style={styles.dailyChallengeTitle}>Match the Animals</Text>
-              <Text style={styles.dailyChallengeDescription}>
-                Help match animals to their habitats
-              </Text>
-            </View>
-            <View style={styles.dailyChallengeIcon}>
-              <Text style={styles.emoji}>🦁</Text>
-            </View>
-          </View>
-        </TouchableOpacity>
+        {/* Today's Challenge */}
+        <TodaysChallenge onPress={handleChallenge} />
 
-        {/* Categories Section */}
-        <View style={styles.sectionContainer}>
-          <Text style={styles.sectionTitle}>Learning Categories</Text>
-          <View style={styles.categoriesContainer}>
-            {categories.map((category) => (
-              <TouchableOpacity 
-                key={category.id} 
-                style={[styles.categoryCard, { backgroundColor: category.color }]}
-              >
-                <Text style={styles.categoryIcon}>{category.icon}</Text>
-                <Text style={styles.categoryTitle}>{category.title}</Text>
-                <Text style={styles.categoryDescription}>{category.description}</Text>
-              </TouchableOpacity>
+        {/* Videos Carousel */}
+        <VideoCarousel data={videoData} />
+
+        {/* Quick Access Staggered List */}
+        <View style={styles.quickAccessContainer}>
+          <Text style={styles.sectionTitle}>Explore & Play</Text>
+          <View style={styles.quickAccessGrid}>
+            {quickAccessItems.map((item, index) => (
+              <QuickAccessItem 
+                key={item.id}
+                item={item}
+                index={index}
+                onPress={handleQuickAccessPress}
+              />
             ))}
           </View>
         </View>
-
-        {/* Recent Activities Section */}
-        <View style={styles.sectionContainer}>
-          <Text style={styles.sectionTitle}>Recently Played</Text>
-          {recentActivities.map((activity) => (
-            <TouchableOpacity 
-              key={activity.id} 
-              style={styles.activityCard}
-            >
-              <View style={[styles.activityColorTag, { backgroundColor: activity.color }]} />
-              <View style={styles.activityDetails}>
-                <Text style={styles.activityTitle}>{activity.title}</Text>
-                <Text style={styles.activityCategory}>{activity.category}</Text>
-              </View>
-              <View style={styles.activityProgress}>
-                <Text style={styles.activityProgressText}>{activity.progress}</Text>
-                <View style={styles.progressBarContainer}>
-                  <View 
-                    style={[
-                      styles.progressBar, 
-                      { 
-                        width: activity.progress,
-                        backgroundColor: activity.color
-                      }
-                    ]} 
-                  />
-                </View>
-              </View>
-            </TouchableOpacity>
-          ))}
-        </View>
-
-        {/* Logout Button - For testing only */}
-        <TouchableOpacity 
-          style={styles.logoutButton}
-          onPress={logout}
-        >
-          <Text style={styles.logoutText}>Logout</Text>
-        </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
   );
@@ -179,69 +338,136 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: COLORS.text,
   },
-  welcomeText: {
-    fontSize: SIZES.medium,
-    color: COLORS.textLight,
-    marginTop: 4,
+  badgeContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 6,
+    backgroundColor: 'rgba(255, 213, 79, 0.2)',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  badgeText: {
+    fontSize: SIZES.small,
+    color: COLORS.text,
+    marginLeft: 6,
+    fontWeight: '500',
   },
   profileButton: {
     padding: 4,
   },
   profileImageContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 46,
+    height: 46,
+    borderRadius: 23,
     backgroundColor: COLORS.primary,
     justifyContent: 'center',
     alignItems: 'center',
+    ...SHADOWS.small,
   },
   profileInitial: {
     fontSize: SIZES.large,
     fontWeight: 'bold',
     color: COLORS.background,
   },
-  dailyChallenge: {
-    backgroundColor: COLORS.secondary,
+  challengeContainer: {
+    backgroundColor: '#E3F2FD',
     borderRadius: SIZES.cardRadius,
     padding: SIZES.medium,
     marginBottom: SIZES.xlarge,
+    borderWidth: 2,
+    borderColor: '#90CAF9',
     ...SHADOWS.medium,
   },
-  dailyChallengeContent: {
+  challengeHeader: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
+    marginBottom: 8,
   },
-  dailyChallengeLabel: {
+  challengeHeaderText: {
     fontSize: SIZES.small,
     fontWeight: 'bold',
-    color: COLORS.background,
-    opacity: 0.9,
-    marginBottom: 4,
+    color: COLORS.accent1,
+    marginLeft: 6,
   },
-  dailyChallengeTitle: {
+  challengeTitle: {
     fontSize: SIZES.xlarge,
     fontWeight: 'bold',
-    color: COLORS.background,
-    marginBottom: 6,
+    color: COLORS.text,
+    marginBottom: SIZES.medium,
   },
-  dailyChallengeDescription: {
-    fontSize: SIZES.font,
-    color: COLORS.background,
-    opacity: 0.9,
+  startButtonContainer: {
+    alignSelf: 'flex-start',
   },
-  dailyChallengeIcon: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+  startButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.accent1,
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 20,
+    ...SHADOWS.small,
+  },
+  startButtonText: {
+    color: '#FFF',
+    fontWeight: '600',
+    marginRight: 6,
+  },
+  buttonIcon: {
+    marginLeft: 4,
+  },
+  carouselContainer: {
+    marginBottom: SIZES.xlarge,
+  },
+  carouselTitle: {
+    fontSize: SIZES.large,
+    fontWeight: 'bold',
+    color: COLORS.text,
+    marginBottom: SIZES.medium,
+    paddingHorizontal: SIZES.screenPadding,
+  },
+  carouselCard: {
+    width: CARD_WIDTH,
+    marginRight: SPACING,
+    borderRadius: SIZES.cardRadius,
+    overflow: 'hidden',
+    backgroundColor: COLORS.background,
+    ...SHADOWS.medium,
+  },
+  carouselImage: {
+    width: '100%',
+    height: 160,
+  },
+  cardOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.2)',
     justifyContent: 'center',
     alignItems: 'center',
   },
-  emoji: {
-    fontSize: 30,
+  playButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255,255,255,0.3)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#FFF',
   },
-  sectionContainer: {
+  cardContent: {
+    padding: SIZES.medium,
+  },
+  cardTitle: {
+    fontSize: SIZES.medium,
+    fontWeight: '600',
+    color: COLORS.text,
+    marginBottom: 4,
+  },
+  cardDuration: {
+    fontSize: SIZES.small,
+    color: COLORS.textLight,
+  },
+  quickAccessContainer: {
     marginBottom: SIZES.xlarge,
   },
   sectionTitle: {
@@ -250,89 +476,82 @@ const styles = StyleSheet.create({
     color: COLORS.text,
     marginBottom: SIZES.medium,
   },
-  categoriesContainer: {
+  quickAccessGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
   },
-  categoryCard: {
+  quickAccessItem: {
     width: '48%',
     borderRadius: SIZES.cardRadius,
-    padding: SIZES.medium,
-    marginBottom: SIZES.medium,
-    ...SHADOWS.small,
-  },
-  categoryIcon: {
-    fontSize: 30,
-    marginBottom: SIZES.small,
-  },
-  categoryTitle: {
-    fontSize: SIZES.medium,
-    fontWeight: 'bold',
-    color: COLORS.background,
-    marginBottom: 4,
-  },
-  categoryDescription: {
-    fontSize: SIZES.small,
-    color: COLORS.background,
-    opacity: 0.9,
-  },
-  activityCard: {
-    flexDirection: 'row',
-    backgroundColor: COLORS.card,
-    borderRadius: SIZES.borderRadius,
-    marginBottom: SIZES.medium,
     overflow: 'hidden',
-    ...SHADOWS.small,
+    marginBottom: 12,
+    ...SHADOWS.medium,
   },
-  activityColorTag: {
-    width: 8,
-    height: '100%',
-  },
-  activityDetails: {
-    flex: 1,
+  quickAccessButton: {
     padding: SIZES.medium,
+    alignItems: 'center',
   },
-  activityTitle: {
+  quickAccessIconContainer: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  quickAccessText: {
+    color: '#FFF',
+    fontWeight: '600',
     fontSize: SIZES.medium,
-    fontWeight: 'bold',
-    color: COLORS.text,
-    marginBottom: 4,
+    textAlign: 'center',
   },
-  activityCategory: {
-    fontSize: SIZES.small,
-    color: COLORS.textLight,
-  },
-  activityProgress: {
-    padding: SIZES.medium,
+  modalContainer: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.7)',
     justifyContent: 'center',
     alignItems: 'center',
   },
-  activityProgressText: {
-    fontSize: SIZES.small,
-    fontWeight: 'bold',
-    color: COLORS.text,
-    marginBottom: 4,
+  videoContainer: {
+    width: '90%',
+    height: '60%',
+    backgroundColor: '#000',
+    borderRadius: SIZES.cardRadius,
+    overflow: 'hidden',
+    position: 'relative',
   },
-  progressBarContainer: {
-    width: 60,
-    height: 6,
-    backgroundColor: COLORS.card,
-    borderRadius: 3,
+  closeButton: {
+    position: 'absolute',
+    top: 15,
+    right: 15,
+    zIndex: 10,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  progressBar: {
+  videoWrapper: {
+    width: '100%',
     height: '100%',
-    borderRadius: 3,
   },
-  logoutButton: {
-    alignSelf: 'center',
-    marginTop: SIZES.large,
-    padding: SIZES.medium,
+  video: {
+    width: '100%',
+    height: '100%',
   },
-  logoutText: {
-    color: COLORS.error,
-    fontSize: SIZES.font,
-    fontWeight: '600',
+  videoTitle: {
+    position: 'absolute',
+    bottom: 20,
+    left: 20,
+    right: 20,
+    color: '#FFF',
+    fontSize: SIZES.medium,
+    fontWeight: 'bold',
+    textShadowColor: 'rgba(0,0,0,0.8)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 3,
   },
 });
 

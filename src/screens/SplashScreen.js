@@ -1,7 +1,8 @@
 import { FontAwesome5 } from '@expo/vector-icons';
 import React, { useEffect } from 'react';
-import { ImageBackground, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import * as Animatable from 'react-native-animatable';
+import FantasyBackground from '../components/backgrounds/FantasyBackground';
 import { COLORS, SIZES } from '../constants/theme';
 
 const SplashScreen = () => {
@@ -15,10 +16,7 @@ const SplashScreen = () => {
   }, []);
 
   return (
-    <ImageBackground
-      style={styles.container}
-      source={{ uri: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1IiBoZWlnaHQ9IjUiPgo8cmVjdCB3aWR0aD0iNSIgaGVpZ2h0PSI1IiBmaWxsPSIjZmZmZmZmIj48L3JlY3Q+CjxyZWN0IHdpZHRoPSIxIiBoZWlnaHQ9IjEiIGZpbGw9IiNmNWY1ZjUiPjwvcmVjdD4KPC9zdmc+' }}
-    >
+    <FantasyBackground>
       <View style={styles.content}>
         <Animatable.View 
           animation="bounceIn"
@@ -71,14 +69,13 @@ const SplashScreen = () => {
           />
         </Animatable.View>
       </View>
-    </ImageBackground>
+    </FantasyBackground>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -87,6 +84,7 @@ const styles = StyleSheet.create({
     width: '100%',
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: 'transparent',
   },
   logoContainer: {
     position: 'relative',

@@ -21,7 +21,7 @@ const TodaysChallengeScreen = () => {
   const options = [
     {
       id: '1',
-      icon: <FontAwesome5 name="snake" size={38} color="#333" />,
+      icon: <FontAwesome5 name="fish" size={38} color="#333" />,
       label: 'S',
       correct: true,
     },

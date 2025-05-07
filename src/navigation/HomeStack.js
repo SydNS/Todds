@@ -1,8 +1,6 @@
 import {
-  FontAwesome,
   FontAwesome5,
-  Ionicons,
-  MaterialCommunityIcons
+  Ionicons
 } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import React from 'react';
@@ -11,11 +9,10 @@ import * as Animatable from 'react-native-animatable';
 import { COLORS, SHADOWS, SIZES } from '../constants/theme';
 
 // Import screens
+import DiscoverScreen from '../screens/discover/DiscoverScreen';
+import HomeScreen from '../screens/home/HomeScreen';
 import MyCornerScreen from '../screens/mycorner/MyCornerScreen';
-import PhonicsFunScreen from '../screens/phonicsfun/PhonicsFunScreen';
 import PlayLearnScreen from '../screens/playlearn/PlayLearnScreen';
-import StoryWorldScreen from '../screens/storyworld/StoryWorldScreen';
-import TodaysChallengeScreen from '../screens/todayschallenge/TodaysChallengeScreen';
 
 // Create tab navigator
 const Tab = createBottomTabNavigator();
@@ -59,21 +56,21 @@ const HomeStack = () => {
         tabBarHideOnKeyboard: true,
         tabBarActiveTintColor: COLORS.primary,
       }}
-      initialRouteName="PlayLearn"
+      initialRouteName="Home"
     >
       <Tab.Screen 
-        name="StoryWorld" 
-        component={StoryWorldScreen} 
+        name="Home" 
+        component={HomeScreen} 
         options={{
           tabBarIcon: ({ focused }) => (
             <AnimatedTabIcon 
-              name="Story World" 
+              name="Home" 
               focused={focused} 
-              color={COLORS.storyWorld.primary}
+              color={COLORS.primary}
               icon={<FontAwesome5 
-                name="book-open" 
+                name="home" 
                 size={24} 
-                color={focused ? "#fff" : COLORS.storyWorld.primary} 
+                color={focused ? "#fff" : COLORS.primary} 
               />}
             />
           ),
@@ -81,18 +78,18 @@ const HomeStack = () => {
         }}
       />
       <Tab.Screen 
-        name="PhonicsFun" 
-        component={PhonicsFunScreen} 
+        name="Discover" 
+        component={DiscoverScreen} 
         options={{
           tabBarIcon: ({ focused }) => (
             <AnimatedTabIcon 
-              name="Phonics Fun" 
+              name="Discover" 
               focused={focused} 
-              color={COLORS.phonicsPlayground.primary}
-              icon={<MaterialCommunityIcons 
-                name="alphabetical" 
-                size={28} 
-                color={focused ? "#fff" : COLORS.phonicsPlayground.primary} 
+              color={COLORS.storyWorld.primary}
+              icon={<FontAwesome5 
+                name="search" 
+                size={24} 
+                color={focused ? "#fff" : COLORS.storyWorld.primary} 
               />}
             />
           ),
@@ -112,25 +109,6 @@ const HomeStack = () => {
                 name="puzzle-piece" 
                 size={24} 
                 color={focused ? "#fff" : COLORS.gameZone.primary} 
-              />}
-            />
-          ),
-          tabBarLabel: () => null,
-        }}
-      />
-      <Tab.Screen 
-        name="TodaysChallenge" 
-        component={TodaysChallengeScreen} 
-        options={{
-          tabBarIcon: ({ focused }) => (
-            <AnimatedTabIcon 
-              name="Today's Challenge" 
-              focused={focused} 
-              color={COLORS.accent1}
-              icon={<FontAwesome 
-                name="target" 
-                size={24} 
-                color={focused ? "#fff" : COLORS.accent1} 
               />}
             />
           ),

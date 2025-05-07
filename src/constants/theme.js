@@ -2,30 +2,34 @@
  * Shekhinah Toddler's Learning App Theme
  */
 
+import { Dimensions } from 'react-native';
+
+const { width, height } = Dimensions.get('window');
+
 // Base colors
 export const COLORS = {
   // Primary app colors
-  primary: '#FF8A65',       // Soft coral
-  secondary: '#4FC3F7',     // Bright sky blue
-  tertiary: '#AED581',      // Soft green
-  background: '#FFFFFF',    // White
-  card: '#F5F5F5',          // Light gray for cards
-  text: '#333333',          // Dark gray for text
-  textLight: '#757575',     // Medium gray for secondary text
+  primary: '#4FC3F7',       // Bright blue
+  secondary: '#FF8A65',      // Coral orange
+  tertiary: '#AED581',       // Light green
+  background: '#F5F9FF',     // Light background
+  card: '#FFFFFF',          // White for cards
+  text: '#3A3A3A',          // Dark gray for main text
+  textLight: '#757575',      // Medium gray for secondary text
   
   // Accent colors
-  accent1: '#FFD54F',       // Soft yellow
-  accent2: '#CE93D8',       // Soft purple
-  accent3: '#81D4FA',       // Light blue
-  accent4: '#A5D6A7',       // Mint green
-  accent5: '#FFB74D',       // Orange
-  accent6: '#F06292',       // Pink
+  accent1: '#FFD54F',        // Yellow
+  accent2: '#CE93D8',        // Purple
+  accent3: '#4DB6AC',        // Teal
+  accent4: '#FF8A65',        // Coral
+  accent5: '#4FC3F7',        // Light blue
+  accent6: '#F06292',        // Pink
   
   // Status colors
-  success: '#66BB6A',       // Green for success messages
-  error: '#EF5350',         // Soft red for errors
-  warning: '#FFCA28',       // Amber for warnings
-  info: '#29B6F6',          // Light blue for info
+  success: '#AED581',        // Green
+  error: '#FF8A65',          // Red
+  warning: '#FFD54F',        // Yellow
+  info: '#29B6F6',           // Light blue for info
   
   // Utility colors
   shadow: 'rgba(0, 0, 0, 0.1)', // Shadow color
@@ -48,29 +52,29 @@ export const COLORS = {
   },
   
   phonicsPlayground: {
-    primary: '#FF8A65',
-    secondary: '#64B5F6',
+    primary: '#4DB6AC',
+    secondary: '#B2DFDB',
     accent: '#FFB74D',
     highlight: '#81C784',
   },
   
   storyWorld: {
-    primary: '#FFB74D',
-    secondary: '#FF8A65',
+    primary: '#FF8A65',
+    secondary: '#FFCCBC',
     accent: '#7986CB',
     highlight: '#A1887F',
   },
   
   gameZone: {
     primary: '#4FC3F7',
-    secondary: '#FFD54F',
+    secondary: '#B3E5FC',
     accent: '#FF8A65',
     highlight: '#AED581',
   },
   
   rhymeRhythm: {
-    primary: '#BA68C8',
-    secondary: '#4FC3F7',
+    primary: '#CE93D8',
+    secondary: '#E1BEE7',
     accent: '#FFD54F',
     highlight: '#FF8A65',
   },
@@ -124,7 +128,7 @@ export const SIZES = {
   small: 12,
   font: 14,
   medium: 16,
-  large: 18,
+  large: 20,
   xlarge: 24,
   xxlarge: 32,
   xxxlarge: 40,
@@ -133,7 +137,7 @@ export const SIZES = {
   buttonHeight: 50,
   inputHeight: 50,
   borderRadius: 12,
-  cardRadius: 16,
+  cardRadius: 20,
   
   // Screen padding
   screenPadding: 16,
@@ -152,39 +156,43 @@ export const SIZES = {
     l: 24,
     xl: 32,
     xxl: 48,
-  }
+  },
+  
+  // Screen dimensions
+  width,
+  height,
 };
 
 // Shadow styles for different elevations
 export const SHADOWS = {
   small: {
-    shadowColor: COLORS.shadow,
+    shadowColor: "#000",
     shadowOffset: {
       width: 0,
       height: 2,
     },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 2,
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   medium: {
-    shadowColor: COLORS.shadow,
+    shadowColor: "#000",
     shadowOffset: {
       width: 0,
       height: 3,
     },
-    shadowOpacity: 0.29,
-    shadowRadius: 4.65,
-    elevation: 4,
+    shadowOpacity: 0.15,
+    shadowRadius: 6,
+    elevation: 5,
   },
   large: {
-    shadowColor: COLORS.shadow,
+    shadowColor: "#000",
     shadowOffset: {
       width: 0,
       height: 5,
     },
-    shadowOpacity: 0.36,
-    shadowRadius: 6.68,
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
     elevation: 8,
   },
 };
@@ -259,4 +267,47 @@ export const THEMES = {
   },
 };
 
-export default { COLORS, FONT, SIZES, SHADOWS, THEMES }; 
+// Playful animations for children's UI
+export const ANIMATIONS = {
+  bounce: {
+    0: { scale: 1 },
+    0.5: { scale: 1.1 },
+    1: { scale: 1 }
+  },
+  pulse: {
+    0: { scale: 1 },
+    0.5: { scale: 1.05 },
+    1: { scale: 1 }
+  },
+  wiggle: {
+    0: { rotate: '0deg' },
+    0.25: { rotate: '-3deg' },
+    0.5: { rotate: '0deg' },
+    0.75: { rotate: '3deg' },
+    1: { rotate: '0deg' },
+  }
+};
+
+// For consistent styling of kid-friendly fonts
+export const FONTS = {
+  heading: {
+    fontWeight: 'bold',
+    fontSize: SIZES.large,
+    color: COLORS.text,
+  },
+  subheading: {
+    fontWeight: '600',
+    fontSize: SIZES.medium,
+    color: COLORS.text,
+  },
+  body: {
+    fontSize: SIZES.font,
+    color: COLORS.text,
+  },
+  caption: {
+    fontSize: SIZES.small,
+    color: COLORS.textLight,
+  },
+};
+
+export default { COLORS, FONT, SIZES, SHADOWS, THEMES, ANIMATIONS, FONTS }; 

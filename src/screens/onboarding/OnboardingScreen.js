@@ -1,50 +1,45 @@
-import React, { useState, useRef } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  FlatList, 
-  Dimensions, 
-  TouchableOpacity,
+import React, { useRef, useState } from 'react';
+import {
+  Animated,
+  Dimensions,
+  FlatList,
   Image,
-  Animated
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from 'react-native';
+import Button from '../../components/Button';
 import { COLORS, SIZES } from '../../constants/theme';
 import { useAuth } from '../../context/AuthContext';
-import Button from '../../components/Button';
 
 const { width, height } = Dimensions.get('window');
 
-// Placeholder image as data URI
-const PLACEHOLDER_IMAGE = { 
-  uri: 'data:image/png;base64,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'
-};
-
-// Onboarding data
+// Onboarding data with Freepik cartoon kids images
 const onboardingData = [
   {
     id: '1',
     title: 'Welcome to Shekhinah Toddlers',
     description: 'A fun and engaging learning experience designed just for your little ones!',
-    image: PLACEHOLDER_IMAGE, 
+    image: { uri: 'https://img.freepik.com/free-vector/happy-cute-kids-boy-girl-reading-book_97632-2117.jpg' },
   },
   {
     id: '2',
     title: 'Interactive Learning',
     description: 'Engaging activities that make learning fun and help develop essential skills.',
-    image: PLACEHOLDER_IMAGE,
+    image: { uri: 'https://img.freepik.com/free-vector/happy-diverse-children-playing-with-educational-toys_74855-6463.jpg' },
   },
   {
     id: '3',
     title: 'Track Progress',
     description: 'Monitor your child\'s progress and celebrate their achievements along the way.',
-    image: PLACEHOLDER_IMAGE,
+    image: { uri: 'https://img.freepik.com/free-vector/kids-online-lessons-illustration_52683-36137.jpg' },
   },
   {
     id: '4',
     title: 'Let\'s Get Started!',
     description: 'Create an account to personalize your child\'s learning experience.',
-    image: PLACEHOLDER_IMAGE,
+    image: { uri: 'https://img.freepik.com/free-vector/happy-diverse-students-celebrating-graduation-from-school_74855-5853.jpg' },
   },
 ];
 

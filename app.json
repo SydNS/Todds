@@ -1,21 +1,27 @@
 {
   "expo": {
-    "name": "my-app",
-    "slug": "my-app",
+    "name": "Todds Learning App",
+    "slug": "todds-learning-app",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "myapp",
+    "scheme": "toddsapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.toddsapp.learning",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
+      "package": "com.toddsapp.learning",
+      "versionCode": 1,
       "edgeToEdgeEnabled": true
     },
     "web": {
@@ -37,6 +43,11 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "eas": {
+        "projectId": "0026b2bd-1161-495b-b0d5-5eb7c832ca10"
+      }
     }
   }
 }
