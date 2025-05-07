@@ -10,7 +10,6 @@ import {
   View
 } from 'react-native';
 import * as Animatable from 'react-native-animatable';
-import IslandBackground from '../../components/backgrounds/IslandBackground';
 import { COLORS, SHADOWS, SIZES } from '../../constants/theme';
 
 const GamesIndexScreen = ({ navigation }) => {
@@ -143,35 +142,33 @@ const GamesIndexScreen = ({ navigation }) => {
   );
 
   return (
-    <IslandBackground>
-      <SafeAreaView style={styles.container}>
-        <View style={styles.header}>
-          <TouchableOpacity
-            style={styles.backButton}
-            onPress={() => navigation.goBack()}
-          >
-            <FontAwesome5 name="arrow-left" size={18} color={COLORS.text} />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>All Games</Text>
-          <View style={{ width: 40 }} />
-        </View>
-        
-        <FlatList
-          data={games}
-          keyExtractor={(item) => item.id}
-          renderItem={renderGameCard}
-          contentContainerStyle={styles.listContent}
-          showsVerticalScrollIndicator={false}
-        />
-      </SafeAreaView>
-    </IslandBackground>
+    <SafeAreaView style={styles.container}>
+      <View style={styles.header}>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
+        >
+          <FontAwesome5 name="arrow-left" size={18} color={COLORS.text} />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>All Games</Text>
+        <View style={{ width: 40 }} />
+      </View>
+      
+      <FlatList
+        data={games}
+        keyExtractor={(item) => item.id}
+        renderItem={renderGameCard}
+        contentContainerStyle={styles.listContent}
+        showsVerticalScrollIndicator={false}
+      />
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'transparent',
+    backgroundColor: COLORS.background,
   },
   header: {
     flexDirection: 'row',
@@ -200,10 +197,10 @@ const styles = StyleSheet.create({
     paddingTop: SIZES.medium,
   },
   gameCard: {
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-    borderRadius: SIZES.borderRadius,
+    backgroundColor: COLORS.card,
+    borderRadius: SIZES.cardRadius,
+    marginBottom: SIZES.spacing.l,
     overflow: 'hidden',
-    marginBottom: SIZES.medium,
     ...SHADOWS.medium,
   },
   gameImage: {

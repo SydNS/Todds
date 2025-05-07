@@ -1,5 +1,5 @@
 import { FontAwesome5 } from '@expo/vector-icons';
-import { useVideoPlayer, VideoView } from 'expo-video';
+import { Video as ExpoVideo, useVideoPlayer, VideoView } from 'expo-video';
 import React, { useEffect, useRef, useState } from 'react';
 import {
   Animated,
@@ -27,28 +27,44 @@ const SPACING = 10;
 const VideoCarousel = ({ data }) => {
   const [selectedVideo, setSelectedVideo] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
+  const [useExpoAV, setUseExpoAV] = useState(false);
+  const videoRef = useRef(null);
   
   // Create the player at the top level with null initial source
   const player = useVideoPlayer(null);
 
   const closeModal = () => {
     setModalVisible(false);
-    if (player) {
+    if (player && !useExpoAV) {
       player.pause();
+    }
+    if (videoRef.current && useExpoAV) {
+      videoRef.current.pauseAsync();
     }
   };
 
   const handleVideoPress = (video) => {
     setSelectedVideo(video);
-    // Update the player source instead of creating a new one
-    if (player) {
+    // Try to use expo-video first
+    if (player && !useExpoAV) {
       player.replaceAsync(video.url)
         .then(() => {
           player.play();
+        })
+        .catch(error => {
+          console.error("Error playing video with expo-video:", error);
+          setUseExpoAV(true);
         });
     }
     setModalVisible(true);
   };
+
+  useEffect(() => {
+    // Load the video using expo-video when modal is opened with useExpoAV
+    if (modalVisible && useExpoAV && videoRef.current && selectedVideo) {
+      videoRef.current.loadAsync({ uri: selectedVideo.url }, {}, false);
+    }
+  }, [modalVisible, useExpoAV, selectedVideo]);
 
   return (
     <View style={styles.carouselContainer}>
@@ -93,12 +109,28 @@ const VideoCarousel = ({ data }) => {
               <FontAwesome5 name="times" size={20} color="#FFF" />
             </TouchableOpacity>
             
-            {selectedVideo && player && (
+            {selectedVideo && !useExpoAV && player && (
               <View style={styles.videoWrapper}>
                 <VideoView
                   player={player}
                   style={styles.video}
                   nativeControls
+                />
+                <Text style={styles.videoTitle}>{selectedVideo.title}</Text>
+              </View>
+            )}
+
+            {selectedVideo && useExpoAV && (
+              <View style={styles.videoWrapper}>
+                <ExpoVideo
+                  ref={videoRef}
+                  style={styles.video}
+                  useNativeControls
+                  resizeMode="contain"
+                  isLooping
+                  onError={(error) => {
+                    console.error("Expo Video error:", error);
+                  }}
                 />
                 <Text style={styles.videoTitle}>{selectedVideo.title}</Text>
               </View>
@@ -193,28 +225,28 @@ const HomeScreen = ({ navigation }) => {
       title: 'ABC Song - Learn English Alphabet for Children',
       thumbnail: 'https://i.ytimg.com/vi/75p-N9YKqNo/maxresdefault.jpg',
       duration: '2:32',
-      url: 'https://assets.mixkit.co/videos/preview/mixkit-a-girl-blowing-a-bubble-gum-at-an-amusement-park-1226-large.mp4',
+      url: 'https://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4', // Expo hosted sample video
     },
     {
       id: '2',
       title: 'Numbers Song 1-10',
       thumbnail: 'https://i.ytimg.com/vi/DR-cfDsHCGA/maxresdefault.jpg',
       duration: '2:48',
-      url: 'https://assets.mixkit.co/videos/preview/mixkit-little-girl-in-nature-with-a-marshmallow-on-a-twig-39766-large.mp4',
+      url: 'https://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4', // Expo hosted sample video
     },
     {
       id: '3',
       title: 'Phonics Song with Two Words',
       thumbnail: 'https://i.ytimg.com/vi/BELlZKpi1Zs/maxresdefault.jpg',
       duration: '2:38',
-      url: 'https://assets.mixkit.co/videos/preview/mixkit-mother-with-her-little-daughter-eating-a-marshmallow-in-nature-39764-large.mp4',
+      url: 'https://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4', // Expo hosted sample video
     },
     {
       id: '4',
       title: 'Colors Song for Kids',
       thumbnail: 'https://i.ytimg.com/vi/_mVE4BJp8Zw/maxresdefault.jpg',
       duration: '3:05',
-      url: 'https://assets.mixkit.co/videos/preview/mixkit-girl-in-neon-sign-1232-large.mp4',
+      url: 'https://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4', // Expo hosted sample video
     },
   ];
   
@@ -229,27 +261,34 @@ const HomeScreen = ({ navigation }) => {
     },
     {
       id: '2',
+      title: 'Books',
+      icon: <FontAwesome5 name="book" size={24} color="#FFF" />,
+      backgroundColor: COLORS.storyWorld.secondary || '#FF9800',
+      screen: 'Books',
+    },
+    {
+      id: '3',
       title: 'Learn Phonics',
       icon: <FontAwesome5 name="font" size={24} color="#FFF" />,
       backgroundColor: COLORS.phonicsPlayground.primary,
       screen: 'LearnPhonics',
     },
     {
-      id: '3',
+      id: '4',
       title: 'Sing with Us',
       icon: <FontAwesome5 name="music" size={24} color="#FFF" />,
       backgroundColor: COLORS.rhymeRhythm.primary,
       screen: 'SingWithUs',
     },
     {
-      id: '4',
+      id: '5',
       title: 'Puzzles & Games',
       icon: <FontAwesome5 name="puzzle-piece" size={24} color="#FFF" />,
       backgroundColor: COLORS.gameZone.primary,
       screen: 'PuzzlesGames',
     },
     {
-      id: '5',
+      id: '6',
       title: 'This Week\'s Favorites',
       icon: <FontAwesome5 name="star" size={24} color="#FFF" />,
       backgroundColor: COLORS.accent1,

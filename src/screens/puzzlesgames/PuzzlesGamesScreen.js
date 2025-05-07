@@ -12,7 +12,6 @@ import {
   View,
 } from 'react-native';
 import * as Animatable from 'react-native-animatable';
-import FantasyBackground from '../../components/backgrounds/FantasyBackground';
 import { COLORS, SHADOWS, SIZES } from '../../constants/theme';
 
 const PuzzlesGamesScreen = ({ navigation }) => {
@@ -200,30 +199,10 @@ const PuzzlesGamesScreen = ({ navigation }) => {
                   {game.description}
                 </Text>
                 <View style={styles.gameMetaContainer}>
-                  <View style={[
-                    styles.difficultyTag, 
-                    {
-                      backgroundColor: 
-                        game.difficulty === 'Easy' ? COLORS.success + '30' :
-                        game.difficulty === 'Medium' ? COLORS.warning + '30' :
-                        COLORS.error + '30'
-                    }
-                  ]}>
-                    <Text style={[
-                      styles.difficultyText,
-                      {
-                        color: 
-                          game.difficulty === 'Easy' ? COLORS.success :
-                          game.difficulty === 'Medium' ? COLORS.warning :
-                          COLORS.error
-                      }
-                    ]}>
-                      {game.difficulty}
-                    </Text>
+                  <View style={styles.gameDifficultyTag}>
+                    <Text style={styles.gameDifficultyText}>{game.difficulty}</Text>
                   </View>
-                  <View style={styles.modeContainer}>
-                    <Text style={styles.modeText}>{game.mode}</Text>
-                  </View>
+                  <Text style={styles.gameMode}>{game.mode}</Text>
                 </View>
               </View>
             </TouchableOpacity>
@@ -232,125 +211,124 @@ const PuzzlesGamesScreen = ({ navigation }) => {
       </View>
     </Animatable.View>
   );
-  
+
   return (
-    <FantasyBackground>
-      <SafeAreaView style={styles.container}>
-        <StatusBar translucent backgroundColor="transparent" barStyle="dark-content" />
-        
-        <View style={styles.header}>
-          <TouchableOpacity 
-            style={styles.backButton} 
-            onPress={() => navigation.goBack()}
+    <SafeAreaView style={styles.container}>
+      <StatusBar barStyle="dark-content" backgroundColor={COLORS.background} />
+      
+      {/* Header */}
+      <View style={styles.header}>
+        <TouchableOpacity 
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
+        >
+          <FontAwesome5 name="arrow-left" size={18} color={COLORS.text} />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Puzzles & Games</Text>
+        <View style={{ width: 40 }} />
+      </View>
+      
+      <ScrollView 
+        contentContainerStyle={styles.scrollContainer}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Welcome Banner */}
+        <Animatable.View 
+          animation="fadeIn" 
+          duration={800}
+          style={styles.welcomeBanner}
+        >
+          <View>
+            <Text style={styles.welcomeTitle}>Let's Play!</Text>
+            <Text style={styles.welcomeSubtitle}>Fun games to help you learn</Text>
+          </View>
+          <Animatable.View 
+            animation="pulse" 
+            iterationCount="infinite" 
+            duration={2000}
           >
-            <FontAwesome5 name="arrow-left" size={18} color={COLORS.text} />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>Puzzles & Games</Text>
-          <View style={{ width: 40 }} />
+            <FontAwesome5 name="gamepad" size={40} color={COLORS.gameZone.primary} />
+          </Animatable.View>
+        </Animatable.View>
+        
+        {/* Featured Game */}
+        <View style={styles.featuredContainer}>
+          <Text style={styles.sectionTitle}>Featured Game</Text>
+          <Animatable.View 
+            animation="fadeInUp" 
+            duration={800}
+            style={styles.featuredCard}
+          >
+            <Image 
+              source={{ uri: featuredGame.thumbnail }}
+              style={styles.featuredImage}
+              resizeMode="cover"
+            />
+            <View style={styles.featuredContent}>
+              <Text style={styles.featuredTitle}>{featuredGame.title}</Text>
+              <Text style={styles.featuredDescription}>
+                {featuredGame.description}
+              </Text>
+              <TouchableOpacity 
+                style={styles.playButton}
+                onPress={() => handleGamePress(featuredGame)}
+              >
+                <Text style={styles.playButtonText}>Play Now</Text>
+                <FontAwesome5 name="play" size={12} color="#FFF" style={styles.buttonIcon} />
+              </TouchableOpacity>
+            </View>
+          </Animatable.View>
         </View>
         
-        <ScrollView 
-          contentContainerStyle={styles.scrollContainer}
-          showsVerticalScrollIndicator={false}
+        {/* Game Categories */}
+        <FlatList
+          data={gameCategories}
+          keyExtractor={item => item.id}
+          renderItem={renderGameCategory}
+          scrollEnabled={false}
+        />
+        
+        {/* See All Games Button */}
+        <Animatable.View 
+          animation="fadeInUp" 
+          duration={800}
+          style={styles.seeAllContainer}
         >
-          {/* Welcome Banner */}
-          <Animatable.View 
-            animation="fadeIn" 
-            duration={800}
-            style={styles.welcomeBanner}
+          <TouchableOpacity 
+            style={styles.seeAllButton}
+            onPress={() => navigation.navigate('GamesIndex')}
           >
+            <Text style={styles.seeAllText}>See All Games</Text>
+            <FontAwesome5 name="arrow-right" size={16} color="#FFF" />
+          </TouchableOpacity>
+        </Animatable.View>
+        
+        {/* Adaptive Difficulty Info */}
+        <Animatable.View 
+          animation="fadeInUp" 
+          duration={800}
+          style={styles.adaptiveContainer}
+        >
+          <View style={styles.adaptiveContent}>
+            <FontAwesome5 name="chart-line" size={32} color={COLORS.gameZone.primary} style={styles.adaptiveIcon} />
             <View>
-              <Text style={styles.welcomeTitle}>Let's Play!</Text>
-              <Text style={styles.welcomeSubtitle}>Fun games to help you learn</Text>
+              <Text style={styles.adaptiveTitle}>Adaptive Difficulty</Text>
+              <Text style={styles.adaptiveDescription}>
+                Games adapt to your child's learning pace and skill level, providing just the right challenge!
+              </Text>
             </View>
-            <Animatable.View 
-              animation="pulse" 
-              iterationCount="infinite" 
-              duration={2000}
-            >
-              <FontAwesome5 name="gamepad" size={40} color={COLORS.gameZone.primary} />
-            </Animatable.View>
-          </Animatable.View>
-          
-          {/* Featured Game */}
-          <View style={styles.featuredContainer}>
-            <Text style={styles.sectionTitle}>Featured Game</Text>
-            <Animatable.View 
-              animation="fadeInUp" 
-              duration={800}
-              style={styles.featuredCard}
-            >
-              <Image 
-                source={{ uri: featuredGame.thumbnail }}
-                style={styles.featuredImage}
-                resizeMode="cover"
-              />
-              <View style={styles.featuredContent}>
-                <Text style={styles.featuredTitle}>{featuredGame.title}</Text>
-                <Text style={styles.featuredDescription}>
-                  {featuredGame.description}
-                </Text>
-                <TouchableOpacity 
-                  style={styles.playButton}
-                  onPress={() => handleGamePress(featuredGame)}
-                >
-                  <Text style={styles.playButtonText}>Play Now</Text>
-                  <FontAwesome5 name="play" size={12} color="#FFF" style={styles.buttonIcon} />
-                </TouchableOpacity>
-              </View>
-            </Animatable.View>
           </View>
-          
-          {/* Game Categories */}
-          <FlatList
-            data={gameCategories}
-            keyExtractor={item => item.id}
-            renderItem={renderGameCategory}
-            scrollEnabled={false}
-          />
-          
-          {/* See All Games Button */}
-          <Animatable.View 
-            animation="fadeInUp" 
-            duration={800}
-            style={styles.seeAllContainer}
-          >
-            <TouchableOpacity 
-              style={styles.seeAllButton}
-              onPress={() => navigation.navigate('GamesIndex')}
-            >
-              <Text style={styles.seeAllText}>See All Games</Text>
-              <FontAwesome5 name="arrow-right" size={16} color="#FFF" />
-            </TouchableOpacity>
-          </Animatable.View>
-          
-          {/* Adaptive Difficulty Info */}
-          <Animatable.View 
-            animation="fadeInUp" 
-            duration={800}
-            style={styles.adaptiveContainer}
-          >
-            <View style={styles.adaptiveContent}>
-              <FontAwesome5 name="chart-line" size={32} color={COLORS.gameZone.primary} style={styles.adaptiveIcon} />
-              <View>
-                <Text style={styles.adaptiveTitle}>Adaptive Difficulty</Text>
-                <Text style={styles.adaptiveDescription}>
-                  Games adapt to your child's learning pace and skill level, providing just the right challenge!
-                </Text>
-              </View>
-            </View>
-          </Animatable.View>
-          
-        </ScrollView>
-      </SafeAreaView>
-    </FantasyBackground>
+        </Animatable.View>
+        
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'transparent',
+    backgroundColor: COLORS.background,
   },
   header: {
     flexDirection: 'row',
@@ -364,10 +342,9 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    backgroundColor: COLORS.card,
     justifyContent: 'center',
     alignItems: 'center',
-    ...SHADOWS.small,
   },
   headerTitle: {
     fontSize: SIZES.large,
@@ -410,7 +387,7 @@ const styles = StyleSheet.create({
   featuredCard: {
     marginHorizontal: SIZES.screenPadding,
     borderRadius: SIZES.cardRadius,
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    backgroundColor: COLORS.background,
     overflow: 'hidden',
     ...SHADOWS.medium,
   },
@@ -430,33 +407,33 @@ const styles = StyleSheet.create({
   featuredDescription: {
     fontSize: SIZES.font,
     color: COLORS.textLight,
-    marginBottom: 16,
+    marginBottom: SIZES.medium,
   },
   playButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: COLORS.primary,
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    borderRadius: SIZES.borderRadius,
     alignSelf: 'flex-start',
+    backgroundColor: COLORS.gameZone.primary,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 20,
   },
   playButtonText: {
     color: '#FFF',
-    fontWeight: 'bold',
-    marginRight: 8,
+    fontWeight: '600',
+    marginRight: 6,
   },
   buttonIcon: {
     marginLeft: 4,
   },
   categoryContainer: {
     marginBottom: SIZES.large,
-    paddingHorizontal: SIZES.screenPadding,
   },
   categoryHeader: {
     flexDirection: 'row',
     alignItems: 'center',
+    paddingHorizontal: SIZES.screenPadding,
     marginBottom: SIZES.small,
   },
   categoryIcon: {
@@ -465,7 +442,7 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 12,
+    marginRight: 10,
   },
   categoryTitle: {
     fontSize: SIZES.medium,
@@ -473,25 +450,29 @@ const styles = StyleSheet.create({
     color: COLORS.text,
   },
   gamesListContent: {
-    paddingRight: SIZES.screenPadding,
+    paddingLeft: SIZES.screenPadding,
+    paddingRight: SIZES.screenPadding / 2,
+    paddingTop: SIZES.small,
   },
   gameCard: {
     width: 220,
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
     borderRadius: SIZES.cardRadius,
+    backgroundColor: COLORS.background,
     marginRight: SIZES.medium,
+    ...SHADOWS.medium,
     overflow: 'hidden',
-    ...SHADOWS.small,
   },
   gameThumbnail: {
     width: '100%',
     height: 120,
+    borderTopLeftRadius: SIZES.cardRadius,
+    borderTopRightRadius: SIZES.cardRadius,
   },
   gameContent: {
-    padding: SIZES.small,
+    padding: SIZES.medium,
   },
   gameTitle: {
-    fontSize: SIZES.font,
+    fontSize: SIZES.medium,
     fontWeight: 'bold',
     color: COLORS.text,
     marginBottom: 4,
@@ -500,61 +481,40 @@ const styles = StyleSheet.create({
     fontSize: SIZES.small,
     color: COLORS.textLight,
     marginBottom: 8,
-    height: 32,
+    height: 32, // Fixed height for 2 lines
   },
   gameMetaContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  difficultyTag: {
+  gameDifficultyTag: {
     paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 4,
+    paddingVertical: 2,
+    backgroundColor: 'rgba(0,0,0,0.05)',
+    borderRadius: 10,
   },
-  difficultyText: {
-    fontSize: SIZES.xsmall,
-    fontWeight: 'bold',
-  },
-  modeContainer: {
-    alignItems: 'flex-end',
-  },
-  modeText: {
-    fontSize: SIZES.xsmall,
+  gameDifficultyText: {
+    fontSize: SIZES.small,
     color: COLORS.textLight,
   },
-  seeAllContainer: {
-    alignItems: 'center',
-    marginVertical: SIZES.large,
-  },
-  seeAllButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: COLORS.gameZone.primary,
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: SIZES.borderRadius,
-    ...SHADOWS.medium,
-  },
-  seeAllText: {
-    color: '#FFF',
-    fontWeight: 'bold',
-    marginRight: 10,
+  gameMode: {
+    fontSize: SIZES.small,
+    color: COLORS.textLight,
   },
   adaptiveContainer: {
+    backgroundColor: 'rgba(174, 213, 129, 0.2)',
+    borderRadius: SIZES.cardRadius,
+    padding: SIZES.medium,
     marginHorizontal: SIZES.screenPadding,
     marginTop: SIZES.medium,
-    padding: SIZES.medium,
-    backgroundColor: 'rgba(255, 255, 255, 0.8)',
-    borderRadius: SIZES.cardRadius,
-    ...SHADOWS.small,
   },
   adaptiveContent: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   adaptiveIcon: {
-    marginRight: 16,
+    marginRight: SIZES.medium,
   },
   adaptiveTitle: {
     fontSize: SIZES.medium,
@@ -563,9 +523,33 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   adaptiveDescription: {
-    fontSize: SIZES.small,
+    fontSize: SIZES.font,
     color: COLORS.textLight,
-    maxWidth: '90%',
+  },
+  containerTitle: {
+    fontSize: SIZES.large,
+    fontWeight: 'bold',
+    color: COLORS.text,
+  },
+  seeAllContainer: {
+    alignItems: 'center',
+    marginVertical: SIZES.spacing.l,
+  },
+  seeAllButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: COLORS.gameZone.primary,
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 25,
+    ...SHADOWS.medium,
+  },
+  seeAllText: {
+    fontSize: SIZES.medium,
+    fontWeight: 'bold',
+    color: '#FFF',
+    marginRight: 10,
   },
 });
 

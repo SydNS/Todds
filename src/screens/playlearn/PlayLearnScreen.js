@@ -11,6 +11,7 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View
 } from 'react-native';
 import * as Animatable from 'react-native-animatable';
@@ -20,7 +21,7 @@ const { width } = Dimensions.get('window');
 const COLUMN_WIDTH = width * 0.42;
 const SPACING = 16;
 
-const PlayLearnScreen = () => {
+const PlayLearnScreen = ({ navigation }) => {
   const categories = [
     {
       id: '1',
@@ -75,6 +76,15 @@ const PlayLearnScreen = () => {
       backgroundColor: COLORS.tertiary,
       onPress: () => console.log('Draw & Tell pressed'),
       height: 170,
+    },
+    {
+      id: '7',
+      title: 'Children\'s Books',
+      description: 'Read interactive storybooks',
+      icon: <FontAwesome5 name="book-open" size={34} color="#333" />,
+      backgroundColor: COLORS.storyWorld.primary,
+      onPress: () => navigation.navigate('Books'),
+      height: 190,
     }
   ];
 
@@ -126,7 +136,10 @@ const PlayLearnScreen = () => {
                   duration={500}
                   style={styles.cardWrapper}
                 >
-                  <StaggeredCategoryCard category={category} />
+                  <StaggeredCategoryCard 
+                    category={category} 
+                    onPress={category.onPress}
+                  />
                 </Animatable.View>
               ))}
             </View>
@@ -141,7 +154,10 @@ const PlayLearnScreen = () => {
                   duration={500}
                   style={styles.cardWrapper}
                 >
-                  <StaggeredCategoryCard category={category} />
+                  <StaggeredCategoryCard 
+                    category={category} 
+                    onPress={category.onPress}
+                  />
                 </Animatable.View>
               ))}
             </View>
@@ -153,9 +169,12 @@ const PlayLearnScreen = () => {
 };
 
 // Custom component for staggered cards
-const StaggeredCategoryCard = ({ category }) => {
+const StaggeredCategoryCard = ({ category, onPress }) => {
   return (
-    <View style={[styles.staggeredCard, { height: category.height, backgroundColor: category.backgroundColor }]}>
+    <TouchableOpacity 
+      style={[styles.staggeredCard, { height: category.height, backgroundColor: category.backgroundColor }]}
+      onPress={onPress || category.onPress}
+    >
       <Animatable.View 
         animation="pulse" 
         iterationCount="infinite" 
@@ -171,7 +190,7 @@ const StaggeredCategoryCard = ({ category }) => {
         <Text style={styles.cardTitle}>{category.title}</Text>
         <Text style={styles.cardDescription}>{category.description}</Text>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 

@@ -4,10 +4,15 @@
     "slug": "todds-learning-app",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/tutoring.png",
     "scheme": "toddsapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/splash/rainbow-landscape.jpg",
+      "resizeMode": "cover",
+      "backgroundColor": "#FFF0F5"
+    },
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.toddsapp.learning",
@@ -17,8 +22,8 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "foregroundImage": "./assets/images/tutoring.png",
+        "backgroundColor": "#FFF0F5"
       },
       "package": "com.toddsapp.learning",
       "versionCode": 1,
@@ -27,19 +32,11 @@
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/tutoring.png"
     },
     "plugins": [
       "expo-router",
-      [
-        "expo-splash-screen",
-        {
-          "image": "./assets/images/splash-icon.png",
-          "imageWidth": 200,
-          "resizeMode": "contain",
-          "backgroundColor": "#ffffff"
-        }
-      ]
+      "expo-splash-screen"
     ],
     "experiments": {
       "typedRoutes": true
