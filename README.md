@@ -2,6 +2,7 @@
 
 A React Native/Expo app focused on creating an educational platform for African toddlers, with colorful, interactive screens designed to make learning fun and engaging.
 
+
 ## Features
 
 ### 📱 Bottom Navigation Tabs
@@ -50,6 +51,18 @@ A personalized space featuring:
 - **Interactive animations** - Button bounces, pulse effects, and celebratory animations
 - **Consistent theme** - Color-coded sections based on activity type
 - **Accessibility** - Dark mode and text size options
+
+## Illustration
+
+![img.png](img.png)![img_1.png](img_1.png)![img_2.png](img_2.png)
+![bg1.jpeg](bg1.jpeg)![bg2.jpeg](bg2.jpeg)![bg3.jpeg](bg3.jpeg)
+![img_3.png](img_3.png)![img_5.png](img_5.png)![img_6.png](img_6.png)
+![bg1.jpeg](bg4.jpeg)![bg4.jpeg](bg4.jpeg)![bg5.jpeg](bg5.jpeg)
+![img.png](img.png)![img_1.png](img_1.png)![img_2.png](img_2.png)
+
+![img_7.png](img_7.png) ![img_8.png](img_8.png)
+
+
 
 ## Technology Stack
 
@@ -112,3 +125,4 @@ A personalized space featuring:
 ## Contributors
 
 - Sydney Nsiimbe - Project lead & Developer
+![img_4.png](img_4.png)
