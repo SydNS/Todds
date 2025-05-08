@@ -4,6 +4,7 @@ import {
   Dimensions,
   FlatList,
   Image,
+  ImageBackground,
   SafeAreaView,
   ScrollView,
   StatusBar,
@@ -14,6 +15,7 @@ import {
 } from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import { COLORS, SHADOWS, SIZES } from '../../constants/theme';
+import { getTransparentOverlay, useRandomBackground } from '../../utils/backgroundUtils';
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = width * 0.42;
@@ -23,6 +25,7 @@ const LearnPhonicsScreen = ({ navigation }) => {
   const [selectedSection, setSelectedSection] = useState('letters');
   const [activeCard, setActiveCard] = useState(null);
   const soundRef = useRef(null);
+  const backgroundImage = useRandomBackground();
   
   const backButtonRef = useRef();
   const sectionButtonsRef = useRef({});
@@ -266,160 +269,166 @@ const LearnPhonicsScreen = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor={COLORS.background} />
-      
-      {/* Header */}
-      <View style={styles.header}>
-        <Animatable.View ref={backButtonRef}>
-          <TouchableOpacity 
-            style={styles.backButton}
-            onPress={() => navigation.goBack()}
-          >
-            <FontAwesome5 name="arrow-left" size={18} color={COLORS.text} />
-          </TouchableOpacity>
-        </Animatable.View>
-        <Text style={styles.headerTitle}>Learn Phonics</Text>
-        <View style={{ width: 40 }} />
-      </View>
-      
-      <ScrollView 
-        contentContainerStyle={styles.scrollContainer}
-        showsVerticalScrollIndicator={false}
+      <ImageBackground 
+        source={backgroundImage}
+        style={styles.backgroundImage}
       >
-        {/* Intro Section with clouds background */}
-        <Animatable.View 
-          animation="fadeIn" 
-          duration={800}
-          style={styles.introContainer}
-        >
-          {/* Cloud decorations */}
-          <Animatable.View 
-            animation="pulse" 
-            iterationCount="infinite" 
-            duration={3000}
-            style={[styles.cloud, { top: 10, left: 20 }]}
-          />
-          <Animatable.View 
-            animation="pulse" 
-            iterationCount="infinite" 
-            duration={4000}
-            style={[styles.cloud, { bottom: 15, right: 30 }]}
-          />
-          
-          <View style={styles.introContent}>
-            <Text style={styles.introTitle}>Let's Learn Phonics!</Text>
-            <Text style={styles.introSubtitle}>Tap on a card to hear sounds</Text>
-          </View>
-        </Animatable.View>
-        
-        {/* Section Selector - Made more playful and colorful */}
-        <View style={styles.sectionSelector}>
-          <Animatable.View
-            ref={ref => sectionButtonsRef.current.letters = ref}
-            animation="bounceIn"
-            duration={800}
-            delay={200}
-          >
-            <TouchableOpacity 
-              style={[
-                styles.sectionButton, 
-                { backgroundColor: selectedSection === 'letters' ? '#FF8A65' : COLORS.card },
-              ]}
-              onPress={() => handleSectionChange('letters')}
-            >
-              <Text style={[
-                styles.sectionButtonText,
-                { color: selectedSection === 'letters' ? '#FFF' : COLORS.text }
-              ]}>
-                Letters
-              </Text>
-            </TouchableOpacity>
-          </Animatable.View>
-          
-          <Animatable.View
-            ref={ref => sectionButtonsRef.current.blends = ref}
-            animation="bounceIn"
-            duration={800}
-            delay={300}
-          >
-            <TouchableOpacity 
-              style={[
-                styles.sectionButton, 
-                { backgroundColor: selectedSection === 'blends' ? '#64B5F6' : COLORS.card },
-              ]}
-              onPress={() => handleSectionChange('blends')}
-            >
-              <Text style={[
-                styles.sectionButtonText,
-                { color: selectedSection === 'blends' ? '#FFF' : COLORS.text }
-              ]}>
-                Blends
-              </Text>
-            </TouchableOpacity>
-          </Animatable.View>
-          
-          <Animatable.View
-            ref={ref => sectionButtonsRef.current.digraphs = ref}
-            animation="bounceIn"
-            duration={800}
-            delay={400}
-          >
-            <TouchableOpacity 
-              style={[
-                styles.sectionButton, 
-                { backgroundColor: selectedSection === 'digraphs' ? '#9575CD' : COLORS.card },
-              ]}
-              onPress={() => handleSectionChange('digraphs')}
-            >
-              <Text style={[
-                styles.sectionButtonText,
-                { color: selectedSection === 'digraphs' ? '#FFF' : COLORS.text }
-              ]}>
-                Digraphs
-              </Text>
-            </TouchableOpacity>
-          </Animatable.View>
-        </View>
-        
-        {/* Phonics Cards - Redesigned to be more visually appealing */}
-        <View style={styles.phonicsContainer}>
-          <FlatList
-            data={selectedSection === 'letters' ? letters : selectedSection === 'blends' ? blends : digraphs}
-            keyExtractor={item => item.id}
-            numColumns={2}
-            scrollEnabled={false}
-            renderItem={renderPhonicsItem}
-            contentContainerStyle={styles.phonicsGrid}
-          />
-        </View>
-        
-        {/* Interactive Practice Game Section */}
-        <Animatable.View 
-          animation="fadeInUp" 
-          duration={800}
-          style={styles.practiceContainer}
-        >
-          <View style={styles.practiceHeader}>
-            <FontAwesome5 name="gamepad" size={24} color={COLORS.primary} />
-            <Text style={styles.practiceTitle}>Practice Time!</Text>
+        <View style={[styles.overlay, getTransparentOverlay()]}>
+          {/* Header */}
+          <View style={styles.header}>
+            <Animatable.View ref={backButtonRef}>
+              <TouchableOpacity 
+                style={styles.backButton}
+                onPress={() => navigation.goBack()}
+              >
+                <FontAwesome5 name="arrow-left" size={18} color={COLORS.text} />
+              </TouchableOpacity>
+            </Animatable.View>
+            <Text style={styles.headerTitle}>Learn Phonics</Text>
+            <View style={{ width: 40 }} />
           </View>
           
-          <Text style={styles.practiceDescription}>
-            Play fun games to practice what you've learned!
-          </Text>
-          
-          <View style={styles.gameButtons}>
-            <TouchableOpacity style={[styles.gameButton, { backgroundColor: '#FF8A65' }]}>
-              <FontAwesome5 name="puzzle-piece" size={22} color="#FFF" style={styles.gameIcon} />
-              <Text style={styles.gameButtonText}>Matching Game</Text>
-            </TouchableOpacity>
+          <ScrollView 
+            contentContainerStyle={styles.scrollContainer}
+            showsVerticalScrollIndicator={false}
+          >
+            {/* Intro Section with clouds background */}
+            <Animatable.View 
+              animation="fadeIn" 
+              duration={800}
+              style={styles.introContainer}
+            >
+              {/* Cloud decorations */}
+              <Animatable.View 
+                animation="pulse" 
+                iterationCount="infinite" 
+                duration={3000}
+                style={[styles.cloud, { top: 10, left: 20 }]}
+              />
+              <Animatable.View 
+                animation="pulse" 
+                iterationCount="infinite" 
+                duration={4000}
+                style={[styles.cloud, { bottom: 15, right: 30 }]}
+              />
+              
+              <View style={styles.introContent}>
+                <Text style={styles.introTitle}>Let's Learn Phonics!</Text>
+                <Text style={styles.introSubtitle}>Tap on a card to hear sounds</Text>
+              </View>
+            </Animatable.View>
             
-            <TouchableOpacity style={[styles.gameButton, { backgroundColor: '#64B5F6' }]}>
-              <FontAwesome5 name="headphones" size={22} color="#FFF" style={styles.gameIcon} />
-              <Text style={styles.gameButtonText}>Listen & Find</Text>
-            </TouchableOpacity>
-          </View>
-        </Animatable.View>
-      </ScrollView>
+            {/* Section Selector - Made more playful and colorful */}
+            <View style={styles.sectionSelector}>
+              <Animatable.View
+                ref={ref => sectionButtonsRef.current.letters = ref}
+                animation="bounceIn"
+                duration={800}
+                delay={200}
+              >
+                <TouchableOpacity 
+                  style={[
+                    styles.sectionButton, 
+                    { backgroundColor: selectedSection === 'letters' ? '#FF8A65' : COLORS.card },
+                  ]}
+                  onPress={() => handleSectionChange('letters')}
+                >
+                  <Text style={[
+                    styles.sectionButtonText,
+                    { color: selectedSection === 'letters' ? '#FFF' : COLORS.text }
+                  ]}>
+                    Letters
+                  </Text>
+                </TouchableOpacity>
+              </Animatable.View>
+              
+              <Animatable.View
+                ref={ref => sectionButtonsRef.current.blends = ref}
+                animation="bounceIn"
+                duration={800}
+                delay={300}
+              >
+                <TouchableOpacity 
+                  style={[
+                    styles.sectionButton, 
+                    { backgroundColor: selectedSection === 'blends' ? '#64B5F6' : COLORS.card },
+                  ]}
+                  onPress={() => handleSectionChange('blends')}
+                >
+                  <Text style={[
+                    styles.sectionButtonText,
+                    { color: selectedSection === 'blends' ? '#FFF' : COLORS.text }
+                  ]}>
+                    Blends
+                  </Text>
+                </TouchableOpacity>
+              </Animatable.View>
+              
+              <Animatable.View
+                ref={ref => sectionButtonsRef.current.digraphs = ref}
+                animation="bounceIn"
+                duration={800}
+                delay={400}
+              >
+                <TouchableOpacity 
+                  style={[
+                    styles.sectionButton, 
+                    { backgroundColor: selectedSection === 'digraphs' ? '#9575CD' : COLORS.card },
+                  ]}
+                  onPress={() => handleSectionChange('digraphs')}
+                >
+                  <Text style={[
+                    styles.sectionButtonText,
+                    { color: selectedSection === 'digraphs' ? '#FFF' : COLORS.text }
+                  ]}>
+                    Digraphs
+                  </Text>
+                </TouchableOpacity>
+              </Animatable.View>
+            </View>
+            
+            {/* Phonics Cards - Redesigned to be more visually appealing */}
+            <View style={styles.phonicsContainer}>
+              <FlatList
+                data={selectedSection === 'letters' ? letters : selectedSection === 'blends' ? blends : digraphs}
+                keyExtractor={item => item.id}
+                numColumns={2}
+                scrollEnabled={false}
+                renderItem={renderPhonicsItem}
+                contentContainerStyle={styles.phonicsGrid}
+              />
+            </View>
+            
+            {/* Interactive Practice Game Section */}
+            <Animatable.View 
+              animation="fadeInUp" 
+              duration={800}
+              style={styles.practiceContainer}
+            >
+              <View style={styles.practiceHeader}>
+                <FontAwesome5 name="gamepad" size={24} color={COLORS.primary} />
+                <Text style={styles.practiceTitle}>Practice Time!</Text>
+              </View>
+              
+              <Text style={styles.practiceDescription}>
+                Play fun games to practice what you've learned!
+              </Text>
+              
+              <View style={styles.gameButtons}>
+                <TouchableOpacity style={[styles.gameButton, { backgroundColor: '#FF8A65' }]}>
+                  <FontAwesome5 name="puzzle-piece" size={22} color="#FFF" style={styles.gameIcon} />
+                  <Text style={styles.gameButtonText}>Matching Game</Text>
+                </TouchableOpacity>
+                
+                <TouchableOpacity style={[styles.gameButton, { backgroundColor: '#64B5F6' }]}>
+                  <FontAwesome5 name="headphones" size={22} color="#FFF" style={styles.gameIcon} />
+                  <Text style={styles.gameButtonText}>Listen & Find</Text>
+                </TouchableOpacity>
+              </View>
+            </Animatable.View>
+          </ScrollView>
+        </View>
+      </ImageBackground>
     </SafeAreaView>
   );
 };
@@ -427,7 +436,14 @@ const LearnPhonicsScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+  },
+  backgroundImage: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
+  },
+  overlay: {
+    flex: 1,
   },
   header: {
     flexDirection: 'row',

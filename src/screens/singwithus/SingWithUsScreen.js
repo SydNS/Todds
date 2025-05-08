@@ -2,6 +2,7 @@ import { FontAwesome5 } from '@expo/vector-icons';
 import React, { useEffect, useRef, useState } from 'react';
 import {
   Image,
+  ImageBackground,
   Modal,
   SafeAreaView,
   ScrollView,
@@ -14,6 +15,7 @@ import {
 import * as Animatable from 'react-native-animatable';
 import { WebView } from 'react-native-webview';
 import { COLORS, SHADOWS, SIZES } from '../../constants/theme';
+import { getTransparentOverlay, useRandomBackground } from '../../utils/backgroundUtils';
 
 const SingWithUsScreen = ({ navigation }) => {
   const [currentSong, setCurrentSong] = useState(null);
@@ -21,6 +23,7 @@ const SingWithUsScreen = ({ navigation }) => {
   const [videoModalVisible, setVideoModalVisible] = useState(false);
   const progressInterval = useRef(null);
   const [progress, setProgress] = useState(0);
+  const backgroundImage = useRandomBackground();
   
   // Song data with YouTube IDs
   const songs = [
@@ -153,235 +156,241 @@ const SingWithUsScreen = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor={COLORS.background} />
-      
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity 
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
-        >
-          <FontAwesome5 name="arrow-left" size={18} color={COLORS.text} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Sing with Us</Text>
-        <View style={{ width: 40 }} />
-      </View>
-      
-      <ScrollView 
-        contentContainerStyle={styles.scrollContainer}
-        showsVerticalScrollIndicator={false}
+      <ImageBackground 
+        source={backgroundImage} 
+        style={styles.backgroundImage}
       >
-        {/* Welcome Section */}
-        <Animatable.View 
-          animation="fadeIn" 
-          duration={800}
-          style={styles.welcomeBanner}
-        >
-          <View>
-            <Text style={styles.welcomeTitle}>Time to Sing!</Text>
-            <Text style={styles.welcomeSubtitle}>Learn through music and rhythm</Text>
-          </View>
-          <Animatable.View 
-            animation="pulse" 
-            iterationCount="infinite" 
-            duration={2000}
-          >
-            <FontAwesome5 name="music" size={40} color={COLORS.rhymeRhythm.primary} />
-          </Animatable.View>
-        </Animatable.View>
-        
-        {/* Categories */}
-        <ScrollView 
-          horizontal 
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.categoriesContainer}
-        >
-          {categories.map((category) => (
+        <View style={[styles.overlay, getTransparentOverlay()]}>
+          {/* Header */}
+          <View style={styles.header}>
             <TouchableOpacity 
-              key={category.id} 
-              style={styles.categoryPill}
+              style={styles.backButton}
+              onPress={() => navigation.goBack()}
             >
-              <Text style={styles.categoryText}>{category.title}</Text>
+              <FontAwesome5 name="arrow-left" size={18} color={COLORS.text} />
             </TouchableOpacity>
-          ))}
-        </ScrollView>
-        
-        {/* Current Song Player (shown when a song is selected) */}
-        {currentSong && (
-          <Animatable.View 
-            animation="fadeInDown" 
-            duration={800}
-            style={styles.playerContainer}
-          >
-            <View style={styles.playerContent}>
-              <TouchableOpacity onPress={openVideoModal}>
-                <Image 
-                  source={{ uri: currentSong.thumbnail }}
-                  style={styles.playerThumbnail}
-                  resizeMode="cover"
-                />
-                <View style={styles.thumbnailOverlay}>
-                  <FontAwesome5 name="play-circle" size={24} color="#FFF" />
-                </View>
-              </TouchableOpacity>
-              
-              <View style={styles.playerInfo}>
-                <Text style={styles.playerTitle}>{currentSong.title}</Text>
-                <Text style={styles.playerCategory}>{currentSong.category}</Text>
-                
-                <View style={styles.playerControls}>
-                  <TouchableOpacity style={styles.controlButton}>
-                    <FontAwesome5 name="step-backward" size={18} color={COLORS.text} />
-                  </TouchableOpacity>
-                  
-                  <TouchableOpacity 
-                    style={styles.playPauseButton}
-                    onPress={togglePlayPause}
-                  >
-                    <FontAwesome5 
-                      name={isPlaying ? "pause" : "play"} 
-                      size={20} 
-                      color="#FFF" 
-                    />
-                  </TouchableOpacity>
-                  
-                  <TouchableOpacity style={styles.controlButton}>
-                    <FontAwesome5 name="step-forward" size={18} color={COLORS.text} />
-                  </TouchableOpacity>
-                </View>
-              </View>
-            </View>
-            
-            <View style={styles.progressBar}>
-              <View style={[styles.progressFill, { width: `${progress * 100}%` }]} />
-            </View>
-            
-            <View style={styles.playerFeatures}>
-              {currentSong.hasLyrics && (
-                <TouchableOpacity style={styles.featureButton}>
-                  <FontAwesome5 name="closed-captioning" size={14} color={COLORS.text} />
-                  <Text style={styles.featureText}>Lyrics</Text>
-                </TouchableOpacity>
-              )}
-              
-              {currentSong.hasSignLanguage && (
-                <TouchableOpacity style={styles.featureButton}>
-                  <FontAwesome5 name="sign-language" size={14} color={COLORS.text} />
-                  <Text style={styles.featureText}>Sign Language</Text>
-                </TouchableOpacity>
-              )}
-            </View>
-          </Animatable.View>
-        )}
-        
-        {/* Songs List */}
-        <View style={styles.songsContainer}>
-          <Text style={styles.sectionTitle}>Popular Songs</Text>
+            <Text style={styles.headerTitle}>Sing with Us</Text>
+            <View style={{ width: 40 }} />
+          </View>
           
-          {songs.map((song) => (
+          <ScrollView 
+            contentContainerStyle={styles.scrollContainer}
+            showsVerticalScrollIndicator={false}
+          >
+            {/* Welcome Section */}
             <Animatable.View 
-              key={song.id}
-              animation="fadeInUp"
-              duration={600}
-              delay={parseInt(song.id) * 100}
+              animation="fadeIn" 
+              duration={800}
+              style={styles.welcomeBanner}
             >
-              <TouchableOpacity 
-                style={styles.songCard}
-                onPress={() => handleSongPress(song)}
+              <View>
+                <Text style={styles.welcomeTitle}>Time to Sing!</Text>
+                <Text style={styles.welcomeSubtitle}>Learn through music and rhythm</Text>
+              </View>
+              <Animatable.View 
+                animation="pulse" 
+                iterationCount="infinite" 
+                duration={2000}
               >
-                <Image 
-                  source={{ uri: song.thumbnail }}
-                  style={styles.songThumbnail}
-                />
-                <View style={styles.songInfo}>
-                  <Text style={styles.songTitle}>{song.title}</Text>
-                  <Text style={styles.songCategory}>{song.category}</Text>
-                  <View style={styles.songFeatures}>
-                    {song.hasLyrics && (
-                      <View style={styles.featureTag}>
-                        <FontAwesome5 name="closed-captioning" size={10} color={COLORS.textLight} />
-                      </View>
-                    )}
-                    {song.hasSignLanguage && (
-                      <View style={styles.featureTag}>
-                        <FontAwesome5 name="sign-language" size={10} color={COLORS.textLight} />
-                      </View>
-                    )}
+                <FontAwesome5 name="music" size={40} color={COLORS.rhymeRhythm.primary} />
+              </Animatable.View>
+            </Animatable.View>
+            
+            {/* Categories */}
+            <ScrollView 
+              horizontal 
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.categoriesContainer}
+            >
+              {categories.map((category) => (
+                <TouchableOpacity 
+                  key={category.id} 
+                  style={styles.categoryPill}
+                >
+                  <Text style={styles.categoryText}>{category.title}</Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+            
+            {/* Current Song Player (shown when a song is selected) */}
+            {currentSong && (
+              <Animatable.View 
+                animation="fadeInDown" 
+                duration={800}
+                style={styles.playerContainer}
+              >
+                <View style={styles.playerContent}>
+                  <TouchableOpacity onPress={openVideoModal}>
+                    <Image 
+                      source={{ uri: currentSong.thumbnail }}
+                      style={styles.playerThumbnail}
+                      resizeMode="cover"
+                    />
+                    <View style={styles.thumbnailOverlay}>
+                      <FontAwesome5 name="play-circle" size={24} color="#FFF" />
+                    </View>
+                  </TouchableOpacity>
+                  
+                  <View style={styles.playerInfo}>
+                    <Text style={styles.playerTitle}>{currentSong.title}</Text>
+                    <Text style={styles.playerCategory}>{currentSong.category}</Text>
+                    
+                    <View style={styles.playerControls}>
+                      <TouchableOpacity style={styles.controlButton}>
+                        <FontAwesome5 name="step-backward" size={18} color={COLORS.text} />
+                      </TouchableOpacity>
+                      
+                      <TouchableOpacity 
+                        style={styles.playPauseButton}
+                        onPress={togglePlayPause}
+                      >
+                        <FontAwesome5 
+                          name={isPlaying ? "pause" : "play"} 
+                          size={20} 
+                          color="#FFF" 
+                        />
+                      </TouchableOpacity>
+                      
+                      <TouchableOpacity style={styles.controlButton}>
+                        <FontAwesome5 name="step-forward" size={18} color={COLORS.text} />
+                      </TouchableOpacity>
+                    </View>
                   </View>
                 </View>
-                <View style={styles.songMeta}>
-                  <Text style={styles.songDuration}>{song.duration}</Text>
+                
+                <View style={styles.progressBar}>
+                  <View style={[styles.progressFill, { width: `${progress * 100}%` }]} />
+                </View>
+                
+                <View style={styles.playerFeatures}>
+                  {currentSong.hasLyrics && (
+                    <TouchableOpacity style={styles.featureButton}>
+                      <FontAwesome5 name="closed-captioning" size={14} color={COLORS.text} />
+                      <Text style={styles.featureText}>Lyrics</Text>
+                    </TouchableOpacity>
+                  )}
+                  
+                  {currentSong.hasSignLanguage && (
+                    <TouchableOpacity style={styles.featureButton}>
+                      <FontAwesome5 name="sign-language" size={14} color={COLORS.text} />
+                      <Text style={styles.featureText}>Sign Language</Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
+              </Animatable.View>
+            )}
+            
+            {/* Songs List */}
+            <View style={styles.songsContainer}>
+              <Text style={styles.sectionTitle}>Popular Songs</Text>
+              
+              {songs.map((song) => (
+                <Animatable.View 
+                  key={song.id}
+                  animation="fadeInUp"
+                  duration={600}
+                  delay={parseInt(song.id) * 100}
+                >
                   <TouchableOpacity 
-                    style={styles.playButton}
+                    style={styles.songCard}
                     onPress={() => handleSongPress(song)}
                   >
-                    <FontAwesome5 name="play" size={12} color="#FFF" />
+                    <Image 
+                      source={{ uri: song.thumbnail }}
+                      style={styles.songThumbnail}
+                    />
+                    <View style={styles.songInfo}>
+                      <Text style={styles.songTitle}>{song.title}</Text>
+                      <Text style={styles.songCategory}>{song.category}</Text>
+                      <View style={styles.songFeatures}>
+                        {song.hasLyrics && (
+                          <View style={styles.featureTag}>
+                            <FontAwesome5 name="closed-captioning" size={10} color={COLORS.textLight} />
+                          </View>
+                        )}
+                        {song.hasSignLanguage && (
+                          <View style={styles.featureTag}>
+                            <FontAwesome5 name="sign-language" size={10} color={COLORS.textLight} />
+                          </View>
+                        )}
+                      </View>
+                    </View>
+                    <View style={styles.songMeta}>
+                      <Text style={styles.songDuration}>{song.duration}</Text>
+                      <TouchableOpacity 
+                        style={styles.playButton}
+                        onPress={() => handleSongPress(song)}
+                      >
+                        <FontAwesome5 name="play" size={12} color="#FFF" />
+                      </TouchableOpacity>
+                    </View>
+                  </TouchableOpacity>
+                </Animatable.View>
+              ))}
+            </View>
+            
+            {/* Traditional Rhymes Section */}
+            <View style={styles.traditionalContainer}>
+              <Text style={styles.sectionTitle}>African Traditional Rhymes</Text>
+              <Animatable.View 
+                animation="fadeIn" 
+                duration={800}
+                style={styles.traditionalCard}
+              >
+                <Image 
+                  source={{ uri: 'https://placehold.co/600x300/FF8A65/FFF?text=Traditional+Rhymes' }}
+                  style={styles.traditionalImage}
+                  resizeMode="cover"
+                />
+                <View style={styles.traditionalContent}>
+                  <Text style={styles.traditionalTitle}>Discover Cultural Rhymes</Text>
+                  <Text style={styles.traditionalDescription}>
+                    Explore traditional African rhymes and songs that celebrate 
+                    our rich heritage and culture.
+                  </Text>
+                  <TouchableOpacity style={styles.exploreButton}>
+                    <Text style={styles.exploreButtonText}>Explore</Text>
+                    <FontAwesome5 name="arrow-right" size={12} color="#FFF" style={styles.buttonIcon} />
                   </TouchableOpacity>
                 </View>
-              </TouchableOpacity>
-            </Animatable.View>
-          ))}
-        </View>
-        
-        {/* Video Modal */}
-        <Modal
-          visible={videoModalVisible}
-          transparent={true}
-          animationType="fade"
-          onRequestClose={closeVideoModal}
-        >
-          <View style={styles.modalContainer}>
-            <View style={styles.videoContainer}>
-              <TouchableOpacity style={styles.closeButton} onPress={closeVideoModal}>
-                <FontAwesome5 name="times" size={20} color="#FFF" />
-              </TouchableOpacity>
-              
-              {currentSong && (
-                <View style={styles.videoWrapper}>
-                  <WebView
-                    source={{ 
-                      uri: `https://www.youtube.com/embed/${currentSong.youtubeId}?rel=0&autoplay=1&playsinline=1` 
-                    }}
-                    style={styles.video}
-                    allowsFullscreenVideo
-                    mediaPlaybackRequiresUserAction={false}
-                    javaScriptEnabled={true}
-                    domStorageEnabled={true}
-                  />
-                  <Text style={styles.videoTitle}>{currentSong.title}</Text>
-                </View>
-              )}
+              </Animatable.View>
             </View>
-          </View>
-        </Modal>
-        
-        {/* Traditional Rhymes Section */}
-        <View style={styles.traditionalContainer}>
-          <Text style={styles.sectionTitle}>African Traditional Rhymes</Text>
-          <Animatable.View 
-            animation="fadeIn" 
-            duration={800}
-            style={styles.traditionalCard}
+            
+          </ScrollView>
+          
+          {/* Video Modal */}
+          <Modal
+            visible={videoModalVisible}
+            transparent={true}
+            animationType="fade"
+            onRequestClose={closeVideoModal}
           >
-            <Image 
-              source={{ uri: 'https://placehold.co/600x300/FF8A65/FFF?text=Traditional+Rhymes' }}
-              style={styles.traditionalImage}
-              resizeMode="cover"
-            />
-            <View style={styles.traditionalContent}>
-              <Text style={styles.traditionalTitle}>Discover Cultural Rhymes</Text>
-              <Text style={styles.traditionalDescription}>
-                Explore traditional African rhymes and songs that celebrate 
-                our rich heritage and culture.
-              </Text>
-              <TouchableOpacity style={styles.exploreButton}>
-                <Text style={styles.exploreButtonText}>Explore</Text>
-                <FontAwesome5 name="arrow-right" size={12} color="#FFF" style={styles.buttonIcon} />
-              </TouchableOpacity>
+            <View style={styles.modalContainer}>
+              <View style={styles.videoContainer}>
+                <TouchableOpacity style={styles.closeButton} onPress={closeVideoModal}>
+                  <FontAwesome5 name="times" size={20} color="#FFF" />
+                </TouchableOpacity>
+                
+                {currentSong && (
+                  <View style={styles.videoWrapper}>
+                    <WebView
+                      source={{ 
+                        uri: `https://www.youtube.com/embed/${currentSong.youtubeId}?rel=0&autoplay=1&playsinline=1` 
+                      }}
+                      style={styles.video}
+                      allowsFullscreenVideo
+                      mediaPlaybackRequiresUserAction={false}
+                      javaScriptEnabled={true}
+                      domStorageEnabled={true}
+                    />
+                    <Text style={styles.videoTitle}>{currentSong.title}</Text>
+                  </View>
+                )}
+              </View>
             </View>
-          </Animatable.View>
+          </Modal>
         </View>
-        
-      </ScrollView>
+      </ImageBackground>
     </SafeAreaView>
   );
 };
@@ -389,7 +398,14 @@ const SingWithUsScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+  },
+  backgroundImage: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
+  },
+  overlay: {
+    flex: 1,
   },
   header: {
     flexDirection: 'row',

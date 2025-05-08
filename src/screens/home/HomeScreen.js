@@ -5,6 +5,7 @@ import {
   Dimensions,
   FlatList,
   Image,
+  ImageBackground,
   Modal,
   SafeAreaView,
   ScrollView,
@@ -18,6 +19,7 @@ import * as Animatable from 'react-native-animatable';
 import { WebView } from 'react-native-webview';
 import { COLORS, SHADOWS, SIZES } from '../../constants/theme';
 import { useAuth } from '../../context/AuthContext';
+import { getTransparentOverlay, SCREEN_TYPES, useScreenBackground } from '../../utils/backgroundUtils';
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = width * 0.8;
@@ -178,6 +180,7 @@ const QuickAccessItem = ({ item, index, onPress }) => {
 
 const HomeScreen = ({ navigation }) => {
   const { userInfo } = useAuth();
+  const backgroundImage = useScreenBackground(SCREEN_TYPES.HOME);
   
   // Updated video data with YouTube videos from the specified playlist
   const videoData = [
@@ -268,51 +271,59 @@ const HomeScreen = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor={COLORS.background} />
-      <ScrollView 
-        contentContainerStyle={styles.scrollContainer}
-        showsVerticalScrollIndicator={false}
+      <ImageBackground 
+        source={backgroundImage} 
+        style={styles.backgroundImage}
+        imageStyle={styles.backgroundImageStyle}
       >
-        {/* Header with welcome message and avatar */}
-        <Animatable.View 
-          animation="fadeIn" 
-          duration={600}
-          style={styles.header}
-        >
-          <View>
-            <Text style={styles.greeting}>Welcome back, {userInfo?.name || 'Friend'}!</Text>
-            <View style={styles.badgeContainer}>
-              <FontAwesome5 name="star" size={14} color={COLORS.accent1} />
-              <Text style={styles.badgeText}>3 lessons today!</Text>
+        <View style={[styles.overlay, getTransparentOverlay()]}>
+          <ScrollView 
+            contentContainerStyle={styles.scrollContainer}
+            showsVerticalScrollIndicator={false}
+          >
+            {/* Header with welcome message and avatar */}
+            <Animatable.View 
+              animation="fadeIn" 
+              duration={600}
+              style={styles.header}
+            >
+              <View>
+                <Text style={styles.greeting}>Welcome back, {userInfo?.name || 'Friend'}!</Text>
+                <View style={styles.badgeContainer}>
+                  <FontAwesome5 name="star" size={14} color={COLORS.accent1} />
+                  <Text style={styles.badgeText}>3 lessons today!</Text>
+                </View>
+              </View>
+              <TouchableOpacity style={styles.profileButton}>
+                <View style={styles.profileImageContainer}>
+                  <Text style={styles.profileInitial}>{(userInfo?.name || 'A').charAt(0)}</Text>
+                </View>
+              </TouchableOpacity>
+            </Animatable.View>
+
+            {/* Today's Challenge */}
+            <TodaysChallenge onPress={handleChallenge} />
+
+            {/* Videos Carousel */}
+            <VideoCarousel data={videoData} />
+
+            {/* Quick Access Staggered List */}
+            <View style={styles.quickAccessContainer}>
+              <Text style={styles.sectionTitle}>Explore & Play</Text>
+              <View style={styles.quickAccessGrid}>
+                {quickAccessItems.map((item, index) => (
+                  <QuickAccessItem 
+                    key={item.id}
+                    item={item}
+                    index={index}
+                    onPress={handleQuickAccessPress}
+                  />
+                ))}
+              </View>
             </View>
-          </View>
-          <TouchableOpacity style={styles.profileButton}>
-            <View style={styles.profileImageContainer}>
-              <Text style={styles.profileInitial}>{(userInfo?.name || 'A').charAt(0)}</Text>
-            </View>
-          </TouchableOpacity>
-        </Animatable.View>
-
-        {/* Today's Challenge */}
-        <TodaysChallenge onPress={handleChallenge} />
-
-        {/* Videos Carousel */}
-        <VideoCarousel data={videoData} />
-
-        {/* Quick Access Staggered List */}
-        <View style={styles.quickAccessContainer}>
-          <Text style={styles.sectionTitle}>Explore & Play</Text>
-          <View style={styles.quickAccessGrid}>
-            {quickAccessItems.map((item, index) => (
-              <QuickAccessItem 
-                key={item.id}
-                item={item}
-                index={index}
-                onPress={handleQuickAccessPress}
-              />
-            ))}
-          </View>
+          </ScrollView>
         </View>
-      </ScrollView>
+      </ImageBackground>
     </SafeAreaView>
   );
 };
@@ -320,7 +331,17 @@ const HomeScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+  },
+  backgroundImage: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
+  },
+  backgroundImageStyle: {
+    opacity: 1,
+  },
+  overlay: {
+    flex: 1,
   },
   scrollContainer: {
     paddingHorizontal: SIZES.screenPadding,

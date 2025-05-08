@@ -4,6 +4,7 @@ import {
     Dimensions,
     FlatList,
     Image,
+    ImageBackground,
     SafeAreaView,
     ScrollView,
     StatusBar,
@@ -14,6 +15,7 @@ import {
 } from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import { COLORS, SHADOWS, SIZES } from '../../constants/theme';
+import { getTransparentOverlay, useRandomBackground } from '../../utils/backgroundUtils';
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = width * 0.7;
@@ -21,6 +23,7 @@ const SPACING = 10;
 
 const BooksScreen = ({ navigation }) => {
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const backgroundImage = useRandomBackground();
   
   // Book categories
   const categories = [
@@ -102,155 +105,161 @@ const BooksScreen = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor={COLORS.background} />
-      
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity 
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
-        >
-          <FontAwesome5 name="arrow-left" size={18} color={COLORS.text} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Children's Books</Text>
-        <View style={{ width: 40 }} />
-      </View>
-      
-      <ScrollView 
-        contentContainerStyle={styles.scrollContainer}
-        showsVerticalScrollIndicator={false}
+      <ImageBackground 
+        source={backgroundImage} 
+        style={styles.backgroundImage}
       >
-        {/* Animated Welcome Banner */}
-        <Animatable.View 
-          animation="fadeIn" 
-          duration={800}
-          style={styles.welcomeBanner}
-        >
-          <View>
-            <Text style={styles.welcomeTitle}>Book Time!</Text>
-            <Text style={styles.welcomeSubtitle}>Choose a book to read along</Text>
+        <View style={[styles.overlay, getTransparentOverlay()]}>
+          {/* Header */}
+          <View style={styles.header}>
+            <TouchableOpacity 
+              style={styles.backButton}
+              onPress={() => navigation.goBack()}
+            >
+              <FontAwesome5 name="arrow-left" size={18} color={COLORS.text} />
+            </TouchableOpacity>
+            <Text style={styles.headerTitle}>Children's Books</Text>
+            <View style={{ width: 40 }} />
           </View>
-          <Animatable.View 
-            animation="pulse" 
-            iterationCount="infinite" 
-            duration={2000}
+          
+          <ScrollView 
+            contentContainerStyle={styles.scrollContainer}
+            showsVerticalScrollIndicator={false}
           >
-            <FontAwesome5 name="book-reader" size={40} color={COLORS.storyWorld.primary} />
-          </Animatable.View>
-        </Animatable.View>
-        
-        {/* Categories */}
-        <View style={styles.categoriesContainer}>
-          <FlatList
-            data={categories}
-            keyExtractor={item => item.id}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            style={styles.categoriesList}
-            renderItem={({ item }) => (
-              <TouchableOpacity 
-                style={[
-                  styles.categoryPill,
-                  selectedCategory === item.name && styles.selectedCategoryPill
-                ]}
-                onPress={() => handleCategoryPress(item)}
+            {/* Animated Welcome Banner */}
+            <Animatable.View 
+              animation="fadeIn" 
+              duration={800}
+              style={styles.welcomeBanner}
+            >
+              <View>
+                <Text style={styles.welcomeTitle}>Book Time!</Text>
+                <Text style={styles.welcomeSubtitle}>Choose a book to read along</Text>
+              </View>
+              <Animatable.View 
+                animation="pulse" 
+                iterationCount="infinite" 
+                duration={2000}
               >
-                <Text 
-                  style={[
-                    styles.categoryText,
-                    selectedCategory === item.name && styles.selectedCategoryText
-                  ]}
-                >
-                  {item.name}
-                </Text>
-              </TouchableOpacity>
-            )}
-          />
-        </View>
-        
-        {/* Books Grid */}
-        <View style={styles.booksContainer}>
-          <Text style={styles.sectionTitle}>{selectedCategory} Books</Text>
-          <Animatable.View animation="fadeInUp" duration={800}>
-            <FlatList
-              data={filteredBooks}
-              keyExtractor={item => item.id}
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.booksListContent}
-              renderItem={({ item, index }) => (
-                <Animatable.View 
-                  animation="fadeInRight"
-                  duration={800}
-                  delay={index * 100}
-                >
+                <FontAwesome5 name="book-reader" size={40} color={COLORS.storyWorld.primary} />
+              </Animatable.View>
+            </Animatable.View>
+            
+            {/* Categories */}
+            <View style={styles.categoriesContainer}>
+              <FlatList
+                data={categories}
+                keyExtractor={item => item.id}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                style={styles.categoriesList}
+                renderItem={({ item }) => (
                   <TouchableOpacity 
-                    style={styles.bookCard}
-                    onPress={() => handleBookPress(item)}
+                    style={[
+                      styles.categoryPill,
+                      selectedCategory === item.name && styles.selectedCategoryPill
+                    ]}
+                    onPress={() => handleCategoryPress(item)}
                   >
-                    <Image 
-                      source={{ uri: item.cover }} 
-                      style={styles.bookCover}
-                      resizeMode="cover"
-                    />
-                    {item.favorite && (
-                      <View style={styles.favoriteTag}>
-                        <FontAwesome5 name="star" size={12} color="#FFF" />
-                      </View>
-                    )}
-                    <View style={styles.bookInfo}>
-                      <Text style={styles.bookTitle} numberOfLines={1}>{item.title}</Text>
-                      <View style={styles.bookMetaContainer}>
-                        <Text style={styles.bookCategory}>{item.category}</Text>
-                        <View style={styles.bookDetailsBadge}>
-                          <Text style={styles.bookDetails}>{item.pages} pages</Text>
-                        </View>
-                      </View>
-                      <View style={styles.readButtonContainer}>
-                        <TouchableOpacity 
-                          style={styles.readButton}
-                          onPress={() => handleBookPress(item)}
-                        >
-                          <Text style={styles.readButtonText}>Read</Text>
-                          <FontAwesome5 name="book-open" size={12} color="#FFF" style={styles.readButtonIcon} />
-                        </TouchableOpacity>
-                      </View>
-                    </View>
+                    <Text 
+                      style={[
+                        styles.categoryText,
+                        selectedCategory === item.name && styles.selectedCategoryText
+                      ]}
+                    >
+                      {item.name}
+                    </Text>
                   </TouchableOpacity>
-                </Animatable.View>
-              )}
-            />
-          </Animatable.View>
-        </View>
-        
-        {/* Featured Book */}
-        <View style={styles.featuredContainer}>
-          <Text style={styles.sectionTitle}>Featured Book</Text>
-          <Animatable.View 
-            animation="fadeInUp" 
-            duration={800}
-            style={styles.featuredCard}
-          >
-            <Image 
-              source={{ uri: 'https://img.freepik.com/free-vector/hand-drawn-flat-design-stack-books_23-2149334862.jpg' }}
-              style={styles.featuredImage}
-              resizeMode="cover"
-            />
-            <View style={styles.featuredContent}>
-              <Text style={styles.featuredTitle}>Short Stories for Children</Text>
-              <Text style={styles.featuredDescription}>
-                A collection of engaging short stories perfect for young readers to enjoy and learn from.
-              </Text>
-              <TouchableOpacity 
-                style={styles.startReadingButton}
-                onPress={() => handleBookPress(books[0])}
-              >
-                <Text style={styles.startReadingText}>Start Reading</Text>
-                <FontAwesome5 name="arrow-right" size={12} color="#FFF" style={styles.buttonIcon} />
-              </TouchableOpacity>
+                )}
+              />
             </View>
-          </Animatable.View>
+            
+            {/* Books Grid */}
+            <View style={styles.booksContainer}>
+              <Text style={styles.sectionTitle}>{selectedCategory} Books</Text>
+              <Animatable.View animation="fadeInUp" duration={800}>
+                <FlatList
+                  data={filteredBooks}
+                  keyExtractor={item => item.id}
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  contentContainerStyle={styles.booksListContent}
+                  renderItem={({ item, index }) => (
+                    <Animatable.View 
+                      animation="fadeInRight"
+                      duration={800}
+                      delay={index * 100}
+                    >
+                      <TouchableOpacity 
+                        style={styles.bookCard}
+                        onPress={() => handleBookPress(item)}
+                      >
+                        <Image 
+                          source={{ uri: item.cover }} 
+                          style={styles.bookCover}
+                          resizeMode="cover"
+                        />
+                        {item.favorite && (
+                          <View style={styles.favoriteTag}>
+                            <FontAwesome5 name="star" size={12} color="#FFF" />
+                          </View>
+                        )}
+                        <View style={styles.bookInfo}>
+                          <Text style={styles.bookTitle} numberOfLines={1}>{item.title}</Text>
+                          <View style={styles.bookMetaContainer}>
+                            <Text style={styles.bookCategory}>{item.category}</Text>
+                            <View style={styles.bookDetailsBadge}>
+                              <Text style={styles.bookDetails}>{item.pages} pages</Text>
+                            </View>
+                          </View>
+                          <View style={styles.readButtonContainer}>
+                            <TouchableOpacity 
+                              style={styles.readButton}
+                              onPress={() => handleBookPress(item)}
+                            >
+                              <Text style={styles.readButtonText}>Read</Text>
+                              <FontAwesome5 name="book-open" size={12} color="#FFF" style={styles.readButtonIcon} />
+                            </TouchableOpacity>
+                          </View>
+                        </View>
+                      </TouchableOpacity>
+                    </Animatable.View>
+                  )}
+                />
+              </Animatable.View>
+            </View>
+            
+            {/* Featured Book */}
+            <View style={styles.featuredContainer}>
+              <Text style={styles.sectionTitle}>Featured Book</Text>
+              <Animatable.View 
+                animation="fadeInUp" 
+                duration={800}
+                style={styles.featuredCard}
+              >
+                <Image 
+                  source={{ uri: 'https://img.freepik.com/free-vector/hand-drawn-flat-design-stack-books_23-2149334862.jpg' }}
+                  style={styles.featuredImage}
+                  resizeMode="cover"
+                />
+                <View style={styles.featuredContent}>
+                  <Text style={styles.featuredTitle}>Short Stories for Children</Text>
+                  <Text style={styles.featuredDescription}>
+                    A collection of engaging short stories perfect for young readers to enjoy and learn from.
+                  </Text>
+                  <TouchableOpacity 
+                    style={styles.startReadingButton}
+                    onPress={() => handleBookPress(books[0])}
+                  >
+                    <Text style={styles.startReadingText}>Start Reading</Text>
+                    <FontAwesome5 name="arrow-right" size={12} color="#FFF" style={styles.buttonIcon} />
+                  </TouchableOpacity>
+                </View>
+              </Animatable.View>
+            </View>
+          </ScrollView>
         </View>
-      </ScrollView>
+      </ImageBackground>
     </SafeAreaView>
   );
 };
@@ -258,7 +267,14 @@ const BooksScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+  },
+  backgroundImage: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
+  },
+  overlay: {
+    flex: 1,
   },
   header: {
     flexDirection: 'row',

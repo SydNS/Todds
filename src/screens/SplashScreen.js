@@ -3,6 +3,7 @@ import React, { useEffect } from 'react';
 import { Dimensions, ImageBackground, StyleSheet, Text, View } from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import { COLORS } from '../constants/theme';
+import { getTransparentOverlay } from '../utils/backgroundUtils';
 
 const { width, height } = Dimensions.get('window');
 
@@ -24,7 +25,7 @@ const SplashScreen = () => {
         style={styles.backgroundImage}
         resizeMode="cover"
       >
-        <View style={styles.overlay}>
+        <View style={[styles.overlay, getTransparentOverlay(0.15)]}>
           {/* Main content */}
           <View style={styles.content}>
             {/* Logo and animated elements */}
@@ -131,7 +132,6 @@ const styles = StyleSheet.create({
   },
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.15)',
     justifyContent: 'center',
     alignItems: 'center',
   },

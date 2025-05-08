@@ -4,6 +4,7 @@ import {
   Dimensions,
   FlatList,
   Image,
+  ImageBackground,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -12,6 +13,7 @@ import {
 import Button from '../../components/Button';
 import { COLORS, SIZES } from '../../constants/theme';
 import { useAuth } from '../../context/AuthContext';
+import { getTransparentOverlay, useRandomBackground } from '../../utils/backgroundUtils';
 
 const { width, height } = Dimensions.get('window');
 
@@ -48,6 +50,7 @@ const OnboardingScreen = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const flatListRef = useRef(null);
   const scrollX = useRef(new Animated.Value(0)).current;
+  const backgroundImage = useRandomBackground();
 
   // Handle skip
   const handleSkip = () => {
@@ -119,40 +122,47 @@ const OnboardingScreen = () => {
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity 
-        style={styles.skipButton} 
-        onPress={handleSkip}
+      <ImageBackground 
+        source={backgroundImage} 
+        style={styles.backgroundImage}
       >
-        <Text style={styles.skipText}>Skip</Text>
-      </TouchableOpacity>
+        <View style={[styles.overlay, getTransparentOverlay()]}>
+          <TouchableOpacity 
+            style={styles.skipButton} 
+            onPress={handleSkip}
+          >
+            <Text style={styles.skipText}>Skip</Text>
+          </TouchableOpacity>
 
-      <FlatList
-        ref={flatListRef}
-        data={onboardingData}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id}
-        horizontal
-        pagingEnabled
-        showsHorizontalScrollIndicator={false}
-        onScroll={Animated.event(
-          [{ nativeEvent: { contentOffset: { x: scrollX } } }],
-          { useNativeDriver: false }
-        )}
-        onMomentumScrollEnd={(event) => {
-          const index = Math.round(event.nativeEvent.contentOffset.x / width);
-          setCurrentIndex(index);
-        }}
-      />
+          <FlatList
+            ref={flatListRef}
+            data={onboardingData}
+            renderItem={renderItem}
+            keyExtractor={(item) => item.id}
+            horizontal
+            pagingEnabled
+            showsHorizontalScrollIndicator={false}
+            onScroll={Animated.event(
+              [{ nativeEvent: { contentOffset: { x: scrollX } } }],
+              { useNativeDriver: false }
+            )}
+            onMomentumScrollEnd={(event) => {
+              const index = Math.round(event.nativeEvent.contentOffset.x / width);
+              setCurrentIndex(index);
+            }}
+          />
 
-      {renderPagination()}
+          {renderPagination()}
 
-      <View style={styles.footer}>
-        <Button 
-          title={currentIndex === onboardingData.length - 1 ? "Get Started" : "Next"} 
-          onPress={handleNext}
-          style={styles.button}
-        />
-      </View>
+          <View style={styles.footer}>
+            <Button 
+              title={currentIndex === onboardingData.length - 1 ? "Get Started" : "Next"} 
+              onPress={handleNext}
+              style={styles.button}
+            />
+          </View>
+        </View>
+      </ImageBackground>
     </View>
   );
 };
@@ -160,7 +170,14 @@ const OnboardingScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+  },
+  backgroundImage: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
+  },
+  overlay: {
+    flex: 1,
   },
   skipButton: {
     position: 'absolute',

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import {
+    ImageBackground,
     KeyboardAvoidingView,
     Platform,
     SafeAreaView,
@@ -13,6 +14,7 @@ import Button from '../../components/Button';
 import TextInput from '../../components/TextInput';
 import { COLORS, SIZES } from '../../constants/theme';
 import { useAuth } from '../../context/AuthContext';
+import { getTransparentOverlay, useRandomBackground } from '../../utils/backgroundUtils';
 
 const SignupScreen = ({ navigation }) => {
   const { register } = useAuth();
@@ -29,6 +31,7 @@ const SignupScreen = ({ navigation }) => {
   
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const backgroundImage = useRandomBackground();
 
   const validateEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -91,111 +94,118 @@ const SignupScreen = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.container}
+      <ImageBackground 
+        source={backgroundImage} 
+        style={styles.backgroundImage}
       >
-        <ScrollView 
-          contentContainerStyle={styles.scrollContainer}
-          showsVerticalScrollIndicator={false}
-        >
-          <View style={styles.header}>
-            <Text style={styles.titleText}>Create Account</Text>
-            <Text style={styles.subtitleText}>Sign up to get started with our learning app</Text>
-          </View>
+        <View style={[styles.overlay, getTransparentOverlay()]}>
+          <KeyboardAvoidingView
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            style={styles.keyboardView}
+          >
+            <ScrollView 
+              contentContainerStyle={styles.scrollContainer}
+              showsVerticalScrollIndicator={false}
+            >
+              <View style={styles.header}>
+                <Text style={styles.welcomeText}>Create Account</Text>
+                <Text style={styles.subtitleText}>Sign up to start your child's learning journey</Text>
+              </View>
 
-          <View style={styles.formContainer}>
-            {error ? <Text style={styles.errorText}>{error}</Text> : null}
+              <View style={styles.formContainer}>
+                {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
-            <Text style={styles.sectionTitle}>Parent Information</Text>
+                <Text style={styles.sectionTitle}>Parent Information</Text>
 
-            <TextInput
-              label="Full Name"
-              placeholder="Enter parent's full name"
-              value={name}
-              onChangeText={setName}
-              autoCapitalize="words"
-            />
+                <TextInput
+                  label="Full Name"
+                  placeholder="Enter parent's full name"
+                  value={name}
+                  onChangeText={setName}
+                  autoCapitalize="words"
+                />
 
-            <TextInput
-              label="Email"
-              placeholder="Enter your email"
-              value={email}
-              onChangeText={setEmail}
-              keyboardType="email-address"
-              autoCapitalize="none"
-            />
+                <TextInput
+                  label="Email"
+                  placeholder="Enter your email"
+                  value={email}
+                  onChangeText={setEmail}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                />
 
-            <TextInput
-              label="Password"
-              placeholder="Create a password"
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry
-            />
+                <TextInput
+                  label="Password"
+                  placeholder="Create a password"
+                  value={password}
+                  onChangeText={setPassword}
+                  secureTextEntry
+                />
 
-            <TextInput
-              label="Confirm Password"
-              placeholder="Confirm your password"
-              value={confirmPassword}
-              onChangeText={setConfirmPassword}
-              secureTextEntry
-            />
-            
-            <Text style={styles.sectionTitle}>Child Information</Text>
-            
-            <TextInput
-              label="Child's Name"
-              placeholder="Enter child's name"
-              value={childName}
-              onChangeText={setChildName}
-              autoCapitalize="words"
-            />
-            
-            <TextInput
-              label="Age"
-              placeholder="Enter child's age (e.g., 4 years)"
-              value={childAge}
-              onChangeText={setChildAge}
-              keyboardType="number-pad"
-            />
-            
-            <TextInput
-              label="Gender"
-              placeholder="Enter child's gender"
-              value={childGender}
-              onChangeText={setChildGender}
-              autoCapitalize="words"
-            />
-            
-            <TextInput
-              label="Grade/Class"
-              placeholder="Enter child's grade or class (e.g., Pre-K)"
-              value={childGrade}
-              onChangeText={setChildGrade}
-              autoCapitalize="words"
-            />
+                <TextInput
+                  label="Confirm Password"
+                  placeholder="Confirm your password"
+                  value={confirmPassword}
+                  onChangeText={setConfirmPassword}
+                  secureTextEntry
+                />
+                
+                <Text style={styles.sectionTitle}>Child Information</Text>
+                
+                <TextInput
+                  label="Child's Name"
+                  placeholder="Enter child's name"
+                  value={childName}
+                  onChangeText={setChildName}
+                  autoCapitalize="words"
+                />
+                
+                <TextInput
+                  label="Age"
+                  placeholder="Enter child's age (e.g., 4 years)"
+                  value={childAge}
+                  onChangeText={setChildAge}
+                  keyboardType="number-pad"
+                />
+                
+                <TextInput
+                  label="Gender"
+                  placeholder="Enter child's gender"
+                  value={childGender}
+                  onChangeText={setChildGender}
+                  autoCapitalize="words"
+                />
+                
+                <TextInput
+                  label="Grade/Class"
+                  placeholder="Enter child's grade or class (e.g., Pre-K)"
+                  value={childGrade}
+                  onChangeText={setChildGrade}
+                  autoCapitalize="words"
+                />
 
-            <Button
-              title="Sign Up"
-              onPress={handleSignup}
-              loading={isLoading}
-              style={styles.signupButton}
-            />
+                <Button
+                  title="Sign Up"
+                  onPress={handleSignup}
+                  loading={isLoading}
+                  style={styles.signupButton}
+                />
 
-            <View style={styles.loginContainer}>
-              <Text style={styles.loginText}>Already have an account? </Text>
-              <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-                <Text style={styles.loginLink}>Sign In</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
+                <View style={styles.loginContainer}>
+                  <Text style={styles.loginText}>Already have an account? </Text>
+                  <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+                    <Text style={styles.loginLink}>Sign In</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
 
-          <Text style={styles.termsText}>
-            By signing up, you agree to our Terms of Service and Privacy Policy
-          </Text>
-        </ScrollView>
-      </KeyboardAvoidingView>
+              <Text style={styles.termsText}>
+                By signing up, you agree to our Terms of Service and Privacy Policy
+              </Text>
+            </ScrollView>
+          </KeyboardAvoidingView>
+        </View>
+      </ImageBackground>
     </SafeAreaView>
   );
 };
@@ -203,19 +213,23 @@ const SignupScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
   },
-  scrollContainer: {
-    flexGrow: 1,
-    paddingHorizontal: SIZES.xlarge,
-    paddingTop: SIZES.xlarge,
-    paddingBottom: SIZES.xlarge * 2,
+  backgroundImage: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
+  },
+  overlay: {
+    flex: 1,
+  },
+  keyboardView: {
+    flex: 1,
   },
   header: {
     alignItems: 'center',
     marginBottom: SIZES.xlarge,
   },
-  titleText: {
+  welcomeText: {
     fontSize: SIZES.xxlarge,
     fontWeight: 'bold',
     color: COLORS.text,

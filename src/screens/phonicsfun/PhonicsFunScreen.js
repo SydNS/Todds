@@ -17,12 +17,16 @@ import {
 } from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import { COLORS, SHADOWS, SIZES } from '../../constants/theme';
+import { getTransparentOverlay, useRandomBackground } from '../../utils/backgroundUtils';
 
 const { width } = Dimensions.get('window');
 const COLUMN_WIDTH = width * 0.42;
 const SPACING = 16;
 
 const PhonicsFunScreen = () => {
+  // Background image using the shared hook
+  const backgroundImage = useRandomBackground();
+  
   // Refs for floating letter animations
   const letterARef = useRef(null);
   const letterBRef = useRef(null);
@@ -110,9 +114,6 @@ const PhonicsFunScreen = () => {
     }
   ];
 
-  // Background pattern for subtle texture
-  const backgroundPattern = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1IiBoZWlnaHQ9IjUiPgo8cmVjdCB3aWR0aD0iNSIgaGVpZ2h0PSI1IiBmaWxsPSIjZmZmIj48L3JlY3Q+CjxyZWN0IHdpZHRoPSIxIiBoZWlnaHQ9IjEiIGZpbGw9IiNmMGYwZjAiPjwvcmVjdD4KPC9zdmc+';
-
   // Organize categories into two columns for staggered grid
   const leftColumn = phonicsCategories.filter((_, index) => index % 2 === 0);
   const rightColumn = phonicsCategories.filter((_, index) => index % 2 !== 0);
@@ -120,85 +121,88 @@ const PhonicsFunScreen = () => {
   return (
     <SafeAreaView style={styles.container}>
       <ImageBackground 
-        source={{ uri: backgroundPattern }}
-        style={styles.backgroundPattern}
+        source={backgroundImage}
+        style={styles.backgroundImage}
+        resizeMode="cover"
       >
-        {/* Decorative floating letters */}
-        <Animatable.Text 
-          ref={letterARef}
-          style={[styles.floatingLetter, { top: 120, left: 20, color: COLORS.phonicsPlayground.primary }]}
-        >
-          A
-        </Animatable.Text>
-        <Animatable.Text 
-          ref={letterBRef}
-          style={[styles.floatingLetter, { top: 180, right: 30, color: COLORS.phonicsPlayground.secondary }]}
-        >
-          B
-        </Animatable.Text>
-        <Animatable.Text 
-          ref={letterCRef}
-          style={[styles.floatingLetter, { top: 240, left: 40, color: COLORS.phonicsPlayground.accent }]}
-        >
-          C
-        </Animatable.Text>
-
-        <Animatable.View 
-          animation="fadeIn" 
-          duration={800} 
-          style={styles.header}
-        >
-          <View style={styles.headerContent}>
-            <Text style={styles.title}>Phonics Fun</Text>
-            <Text style={styles.subtitle}>Play with letter sounds!</Text>
-          </View>
-          <Animatable.View 
-            animation="bounceIn" 
-            delay={500}
-            style={styles.decoration}
+        <View style={[styles.overlay, getTransparentOverlay()]}>
+          {/* Decorative floating letters */}
+          <Animatable.Text 
+            ref={letterARef}
+            style={[styles.floatingLetter, { top: 120, left: 20, color: COLORS.phonicsPlayground.primary }]}
           >
-            <MaterialCommunityIcons name="music-note" size={24} color={COLORS.phonicsPlayground.accent} style={[styles.decorationIcon, {transform: [{rotate: '-15deg'}]}]} />
-            <MaterialCommunityIcons name="music-note" size={18} color={COLORS.phonicsPlayground.primary} style={[styles.decorationIcon, {top: -10, right: 10, transform: [{rotate: '10deg'}]}]} />
+            A
+          </Animatable.Text>
+          <Animatable.Text 
+            ref={letterBRef}
+            style={[styles.floatingLetter, { top: 180, right: 30, color: COLORS.phonicsPlayground.secondary }]}
+          >
+            B
+          </Animatable.Text>
+          <Animatable.Text 
+            ref={letterCRef}
+            style={[styles.floatingLetter, { top: 240, left: 40, color: COLORS.phonicsPlayground.accent }]}
+          >
+            C
+          </Animatable.Text>
+
+          <Animatable.View 
+            animation="fadeIn" 
+            duration={800} 
+            style={styles.header}
+          >
+            <View style={styles.headerContent}>
+              <Text style={styles.title}>Phonics Fun</Text>
+              <Text style={styles.subtitle}>Play with letter sounds!</Text>
+            </View>
+            <Animatable.View 
+              animation="bounceIn" 
+              delay={500}
+              style={styles.decoration}
+            >
+              <MaterialCommunityIcons name="music-note" size={24} color={COLORS.phonicsPlayground.accent} style={[styles.decorationIcon, {transform: [{rotate: '-15deg'}]}]} />
+              <MaterialCommunityIcons name="music-note" size={18} color={COLORS.phonicsPlayground.primary} style={[styles.decorationIcon, {top: -10, right: 10, transform: [{rotate: '10deg'}]}]} />
+            </Animatable.View>
           </Animatable.View>
-        </Animatable.View>
 
-        <ScrollView 
-          style={styles.scrollView}
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.scrollViewContent}
-        >
-          <View style={styles.staggeredGrid}>
-            {/* Left Column */}
-            <View style={styles.column}>
-              {leftColumn.map((category, index) => (
-                <Animatable.View
-                  key={category.id}
-                  animation="fadeInUp"
-                  delay={300 + (index * 100)}
-                  duration={500}
-                  style={styles.cardWrapper}
-                >
-                  <PhonicsCard category={category} />
-                </Animatable.View>
-              ))}
-            </View>
+          <ScrollView 
+            style={styles.scrollView}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={styles.scrollViewContent}
+          >
+            <View style={styles.staggeredGrid}>
+              {/* Left Column */}
+              <View style={styles.column}>
+                {leftColumn.map((category, index) => (
+                  <Animatable.View
+                    key={category.id}
+                    animation="fadeInUp"
+                    delay={300 + (index * 100)}
+                    duration={500}
+                    style={styles.cardWrapper}
+                  >
+                    <PhonicsCard category={category} />
+                  </Animatable.View>
+                ))}
+              </View>
 
-            {/* Right Column */}
-            <View style={styles.column}>
-              {rightColumn.map((category, index) => (
-                <Animatable.View
-                  key={category.id}
-                  animation="fadeInUp"
-                  delay={400 + (index * 100)}
-                  duration={500}
-                  style={styles.cardWrapper}
-                >
-                  <PhonicsCard category={category} />
-                </Animatable.View>
-              ))}
+              {/* Right Column */}
+              <View style={styles.column}>
+                {rightColumn.map((category, index) => (
+                  <Animatable.View
+                    key={category.id}
+                    animation="fadeInUp"
+                    delay={400 + (index * 100)}
+                    duration={500}
+                    style={styles.cardWrapper}
+                  >
+                    <PhonicsCard category={category} />
+                  </Animatable.View>
+                ))}
+              </View>
             </View>
-          </View>
-        </ScrollView>
+          </ScrollView>
+        </View>
       </ImageBackground>
     </SafeAreaView>
   );
@@ -240,10 +244,15 @@ const PhonicsCard = ({ category }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
   },
-  backgroundPattern: {
+  backgroundImage: {
     flex: 1,
+    width: '100%',
+  },
+  overlay: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
   },
   header: {
     paddingHorizontal: SIZES.screenPadding,

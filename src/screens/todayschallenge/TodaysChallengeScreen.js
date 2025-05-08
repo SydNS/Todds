@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import { COLORS, SHADOWS, SIZES } from '../../constants/theme';
+import { getTransparentOverlay } from '../../utils/backgroundUtils';
 
 const TodaysChallengeScreen = () => {
   const [completed, setCompleted] = useState(false);
@@ -82,107 +83,109 @@ const TodaysChallengeScreen = () => {
         source={{ uri: backgroundPattern }}
         style={styles.backgroundPattern}
       >
-        <Animatable.View 
-          animation="fadeIn" 
-          duration={800} 
-          style={styles.header}
-        >
-          <Text style={styles.title}>Today's Challenge</Text>
+        <View style={[styles.overlay, getTransparentOverlay()]}>
           <Animatable.View 
-            animation="pulse" 
-            iterationCount="infinite" 
-            duration={2000}
-            style={styles.starContainer}
+            animation="fadeIn" 
+            duration={800} 
+            style={styles.header}
           >
-            <FontAwesome5 name="star" size={24} color={COLORS.accent1} />
+            <Text style={styles.title}>Today's Challenge</Text>
+            <Animatable.View 
+              animation="pulse" 
+              iterationCount="infinite" 
+              duration={2000}
+              style={styles.starContainer}
+            >
+              <FontAwesome5 name="star" size={24} color={COLORS.accent1} />
+            </Animatable.View>
           </Animatable.View>
-        </Animatable.View>
 
-        <Animatable.View 
-          animation="fadeIn" 
-          duration={1000} 
-          delay={300}
-          style={styles.challengeCard}
-        >
-          <View style={styles.challengeTitleContainer}>
-            <FontAwesome5 name="question-circle" size={20} color={COLORS.accent2} style={styles.questionIcon} />
-            <Text style={styles.challengeTitle}>
-              Find the letter that makes the "sss" sound
-            </Text>
-          </View>
-
-          {completed ? (
-            <Animated.View 
-              style={[
-                styles.successContainer, 
-                { transform: [{ scale: scaleAnim }] }
-              ]}
-            >
-              <Animatable.View animation="bounceIn" duration={1000} style={styles.trophyContainer}>
-                <FontAwesome5 name="trophy" size={70} color={COLORS.accent1} />
-                <Animatable.View animation="fadeIn" delay={600} duration={800} style={styles.confettiLeft}>
-                  <FontAwesome5 name="star" size={14} color={COLORS.accent6} />
-                </Animatable.View>
-                <Animatable.View animation="fadeIn" delay={800} duration={800} style={styles.confettiRight}>
-                  <FontAwesome5 name="star" size={14} color={COLORS.accent3} />
-                </Animatable.View>
-                <Animatable.View animation="fadeIn" delay={1000} duration={800} style={styles.confettiTop}>
-                  <FontAwesome5 name="star" size={14} color={COLORS.primary} />
-                </Animatable.View>
-              </Animatable.View>
-              <Text style={styles.successText}>Great job!</Text>
-              <Text style={styles.successSubtext}>You found the right answer</Text>
-
-              <View style={styles.buttonRow}>
-                <TouchableOpacity 
-                  style={[styles.button, styles.nextButton]} 
-                  onPress={handleNextChallenge}
-                >
-                  <Text style={styles.buttonText}>Next Challenge</Text>
-                  <FontAwesome5 name="arrow-right" size={14} color="#FFF" style={styles.buttonIcon} />
-                </TouchableOpacity>
-              </View>
-            </Animated.View>
-          ) : (
-            <View style={styles.optionsContainer}>
-              {options.map((option) => (
-                <TouchableOpacity
-                  key={option.id}
-                  style={[
-                    styles.optionButton,
-                    selectedOption === option.id && (option.correct ? styles.correctOption : styles.incorrectOption)
-                  ]}
-                  onPress={() => handleSelectOption(option)}
-                  disabled={selectedOption !== null}
-                >
-                  <Animatable.View
-                    animation={selectedOption === option.id ? (option.correct ? "pulse" : "shake") : "pulse"}
-                    iterationCount={selectedOption === option.id ? (option.correct ? "infinite" : 1) : "infinite"}
-                    duration={1500}
-                    style={styles.optionIconContainer}
-                  >
-                    {option.icon}
-                  </Animatable.View>
-                  <Text style={styles.optionLabel}>{option.label}</Text>
-                </TouchableOpacity>
-              ))}
+          <Animatable.View 
+            animation="fadeIn" 
+            duration={1000} 
+            delay={300}
+            style={styles.challengeCard}
+          >
+            <View style={styles.challengeTitleContainer}>
+              <FontAwesome5 name="question-circle" size={20} color={COLORS.accent2} style={styles.questionIcon} />
+              <Text style={styles.challengeTitle}>
+                Find the letter that makes the "sss" sound
+              </Text>
             </View>
-          )}
 
-          {selectedOption !== null && !completed && (
-            <TouchableOpacity 
-              style={styles.tryAgainButton} 
-              onPress={handleTryAgain}
-            >
-              <Text style={styles.tryAgainText}>Try Again</Text>
-            </TouchableOpacity>
-          )}
-        </Animatable.View>
+            {completed ? (
+              <Animated.View 
+                style={[
+                  styles.successContainer, 
+                  { transform: [{ scale: scaleAnim }] }
+                ]}
+              >
+                <Animatable.View animation="bounceIn" duration={1000} style={styles.trophyContainer}>
+                  <FontAwesome5 name="trophy" size={70} color={COLORS.accent1} />
+                  <Animatable.View animation="fadeIn" delay={600} duration={800} style={styles.confettiLeft}>
+                    <FontAwesome5 name="star" size={14} color={COLORS.accent6} />
+                  </Animatable.View>
+                  <Animatable.View animation="fadeIn" delay={800} duration={800} style={styles.confettiRight}>
+                    <FontAwesome5 name="star" size={14} color={COLORS.accent3} />
+                  </Animatable.View>
+                  <Animatable.View animation="fadeIn" delay={1000} duration={800} style={styles.confettiTop}>
+                    <FontAwesome5 name="star" size={14} color={COLORS.primary} />
+                  </Animatable.View>
+                </Animatable.View>
+                <Text style={styles.successText}>Great job!</Text>
+                <Text style={styles.successSubtext}>You found the right answer</Text>
 
-        <View style={styles.progressContainer}>
-          <Text style={styles.progressText}>Challenge 1 of 3</Text>
-          <View style={styles.progressBar}>
-            <View style={styles.progressFill} />
+                <View style={styles.buttonRow}>
+                  <TouchableOpacity 
+                    style={[styles.button, styles.nextButton]} 
+                    onPress={handleNextChallenge}
+                  >
+                    <Text style={styles.buttonText}>Next Challenge</Text>
+                    <FontAwesome5 name="arrow-right" size={14} color="#FFF" style={styles.buttonIcon} />
+                  </TouchableOpacity>
+                </View>
+              </Animated.View>
+            ) : (
+              <View style={styles.optionsContainer}>
+                {options.map((option) => (
+                  <TouchableOpacity
+                    key={option.id}
+                    style={[
+                      styles.optionButton,
+                      selectedOption === option.id && (option.correct ? styles.correctOption : styles.incorrectOption)
+                    ]}
+                    onPress={() => handleSelectOption(option)}
+                    disabled={selectedOption !== null}
+                  >
+                    <Animatable.View
+                      animation={selectedOption === option.id ? (option.correct ? "pulse" : "shake") : "pulse"}
+                      iterationCount={selectedOption === option.id ? (option.correct ? "infinite" : 1) : "infinite"}
+                      duration={1500}
+                      style={styles.optionIconContainer}
+                    >
+                      {option.icon}
+                    </Animatable.View>
+                    <Text style={styles.optionLabel}>{option.label}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            )}
+
+            {selectedOption !== null && !completed && (
+              <TouchableOpacity 
+                style={styles.tryAgainButton} 
+                onPress={handleTryAgain}
+              >
+                <Text style={styles.tryAgainText}>Try Again</Text>
+              </TouchableOpacity>
+            )}
+          </Animatable.View>
+
+          <View style={styles.progressContainer}>
+            <Text style={styles.progressText}>Challenge 1 of 3</Text>
+            <View style={styles.progressBar}>
+              <View style={styles.progressFill} />
+            </View>
           </View>
         </View>
       </ImageBackground>
@@ -196,6 +199,9 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.background,
   },
   backgroundPattern: {
+    flex: 1,
+  },
+  overlay: {
     flex: 1,
   },
   header: {

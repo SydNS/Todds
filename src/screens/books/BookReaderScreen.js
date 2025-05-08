@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import {
     ActivityIndicator,
     Dimensions,
+    ImageBackground,
     SafeAreaView,
     StatusBar,
     StyleSheet,
@@ -13,72 +14,80 @@ import {
 import * as Animatable from 'react-native-animatable';
 import { WebView } from 'react-native-webview';
 import { COLORS, SIZES } from '../../constants/theme';
+import { getTransparentOverlay, useRandomBackground } from '../../utils/backgroundUtils';
 
 const { width, height } = Dimensions.get('window');
 
 const BookReaderScreen = ({ navigation, route }) => {
   const { book } = route.params;
   const [isLoading, setIsLoading] = useState(true);
+  const backgroundImage = useRandomBackground();
 
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor={COLORS.background} />
-      
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity 
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
-        >
-          <FontAwesome5 name="arrow-left" size={18} color={COLORS.text} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle} numberOfLines={1}>{book.title}</Text>
-        <View style={{ width: 40 }} />
-      </View>
-      
-      {/* Loading Indicator */}
-      {isLoading && (
-        <Animatable.View 
-          animation="fadeIn" 
-          style={styles.loadingContainer}
-        >
-          <ActivityIndicator size="large" color={COLORS.storyWorld.primary} />
-          <Text style={styles.loadingText}>Loading your book...</Text>
-        </Animatable.View>
-      )}
-      
-      {/* PDF Viewer */}
-      <View style={styles.webViewContainer}>
-        <WebView
-          source={{ uri: book.url }}
-          style={styles.webView}
-          onLoadStart={() => setIsLoading(true)}
-          onLoadEnd={() => setIsLoading(false)}
-          onError={(syntheticEvent) => {
-            const { nativeEvent } = syntheticEvent;
-            console.error('WebView error: ', nativeEvent);
-          }}
-          // Enable JavaScript and DOM storage for better PDF rendering
-          javaScriptEnabled={true}
-          domStorageEnabled={true}
-          startInLoadingState={true}
-          renderLoading={() => <ActivityIndicator color={COLORS.storyWorld.primary} size="large" />}
-          // Allow scaling and gestures for better PDF interaction
-          scalesPageToFit={true}
-          bounces={false}
-        />
-      </View>
-      
-      {/* Controls */}
-      <View style={styles.controls}>
-        <TouchableOpacity 
-          style={styles.controlButton}
-          onPress={() => navigation.goBack()}
-        >
-          <FontAwesome5 name="times" size={20} color="#FFF" />
-          <Text style={styles.controlText}>Close</Text>
-        </TouchableOpacity>
-      </View>
+      <ImageBackground 
+        source={backgroundImage}
+        style={styles.backgroundImage}
+      >
+        <View style={[styles.overlay, getTransparentOverlay()]}>
+          {/* Header */}
+          <View style={styles.header}>
+            <TouchableOpacity 
+              style={styles.backButton}
+              onPress={() => navigation.goBack()}
+            >
+              <FontAwesome5 name="arrow-left" size={18} color={COLORS.text} />
+            </TouchableOpacity>
+            <Text style={styles.headerTitle} numberOfLines={1}>{book.title}</Text>
+            <View style={{ width: 40 }} />
+          </View>
+          
+          {/* Loading Indicator */}
+          {isLoading && (
+            <Animatable.View 
+              animation="fadeIn" 
+              style={styles.loadingContainer}
+            >
+              <ActivityIndicator size="large" color={COLORS.storyWorld.primary} />
+              <Text style={styles.loadingText}>Loading your book...</Text>
+            </Animatable.View>
+          )}
+          
+          {/* PDF Viewer */}
+          <View style={styles.webViewContainer}>
+            <WebView
+              source={{ uri: book.url }}
+              style={styles.webView}
+              onLoadStart={() => setIsLoading(true)}
+              onLoadEnd={() => setIsLoading(false)}
+              onError={(syntheticEvent) => {
+                const { nativeEvent } = syntheticEvent;
+                console.error('WebView error: ', nativeEvent);
+              }}
+              // Enable JavaScript and DOM storage for better PDF rendering
+              javaScriptEnabled={true}
+              domStorageEnabled={true}
+              startInLoadingState={true}
+              renderLoading={() => <ActivityIndicator color={COLORS.storyWorld.primary} size="large" />}
+              // Allow scaling and gestures for better PDF interaction
+              scalesPageToFit={true}
+              bounces={false}
+            />
+          </View>
+          
+          {/* Controls */}
+          <View style={styles.controls}>
+            <TouchableOpacity 
+              style={styles.controlButton}
+              onPress={() => navigation.goBack()}
+            >
+              <FontAwesome5 name="times" size={20} color="#FFF" />
+              <Text style={styles.controlText}>Close</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </ImageBackground>
     </SafeAreaView>
   );
 };
@@ -86,7 +95,14 @@ const BookReaderScreen = ({ navigation, route }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+  },
+  backgroundImage: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
+  },
+  overlay: {
+    flex: 1,
   },
   header: {
     flexDirection: 'row',
@@ -95,7 +111,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: SIZES.screenPadding,
     paddingTop: SIZES.medium,
     paddingBottom: SIZES.small,
-    backgroundColor: COLORS.background,
     zIndex: 10,
   },
   backButton: {

@@ -1,33 +1,36 @@
+import { FontAwesome5 } from '@expo/vector-icons';
 import React, { useState } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  TouchableOpacity, 
-  KeyboardAvoidingView, 
-  Platform,
-  ScrollView,
-  SafeAreaView,
-  Alert
+import {
+    ImageBackground,
+    KeyboardAvoidingView,
+    Platform,
+    SafeAreaView,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View
 } from 'react-native';
-import { COLORS, SIZES } from '../../constants/theme';
-import { useAuth } from '../../context/AuthContext';
 import Button from '../../components/Button';
 import TextInput from '../../components/TextInput';
+import { COLORS, SIZES } from '../../constants/theme';
+import { useAuth } from '../../context/AuthContext';
+import { getTransparentOverlay, useRandomBackground } from '../../utils/backgroundUtils';
 
 const ForgotPasswordScreen = ({ navigation }) => {
   const { resetPassword } = useAuth();
   const [email, setEmail] = useState('');
+  const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [isSubmitted, setIsSubmitted] = useState(false);
+  const backgroundImage = useRandomBackground();
 
   const validateEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
   };
 
-  const handleSubmit = async () => {
+  const handleResetPassword = async () => {
     // Clear previous errors
     setError('');
 
@@ -47,7 +50,7 @@ const ForgotPasswordScreen = ({ navigation }) => {
     try {
       const result = await resetPassword(email);
       if (result.success) {
-        setIsSubmitted(true);
+        setMessage("We've sent a password reset link to your email!");
       } else {
         setError(result.error);
       }
@@ -60,64 +63,64 @@ const ForgotPasswordScreen = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.container}
+      <ImageBackground 
+        source={backgroundImage} 
+        style={styles.backgroundImage}
       >
-        <ScrollView 
-          contentContainerStyle={styles.scrollContainer}
-          showsVerticalScrollIndicator={false}
-        >
-          <TouchableOpacity 
-            style={styles.backButton}
-            onPress={() => navigation.goBack()}
+        <View style={[styles.overlay, getTransparentOverlay()]}>
+          <KeyboardAvoidingView
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            style={styles.keyboardView}
           >
-            <Text style={styles.backButtonText}>← Back</Text>
-          </TouchableOpacity>
+            <ScrollView 
+              contentContainerStyle={styles.scrollContainer}
+              showsVerticalScrollIndicator={false}
+            >
+              <TouchableOpacity 
+                style={styles.backButton}
+                onPress={() => navigation.goBack()}
+              >
+                <FontAwesome5 name="arrow-left" size={20} color={COLORS.text} />
+              </TouchableOpacity>
 
-          <View style={styles.header}>
-            <Text style={styles.titleText}>Forgot Password</Text>
-            <Text style={styles.subtitleText}>
-              {isSubmitted 
-                ? "We've sent a password reset link to your email!" 
-                : "Enter your email and we'll send you a link to reset your password"}
-            </Text>
-          </View>
+              <View style={styles.header}>
+                <Text style={styles.titleText}>Reset Password</Text>
+                <Text style={styles.subtitleText}>
+                  Enter your email and we'll send you instructions to reset your password
+                </Text>
+              </View>
 
-          {!isSubmitted ? (
-            <View style={styles.formContainer}>
-              {error ? <Text style={styles.errorText}>{error}</Text> : null}
+              <View style={styles.formContainer}>
+                {error ? <Text style={styles.errorText}>{error}</Text> : null}
+                {message ? <Text style={styles.successText}>{message}</Text> : null}
 
-              <TextInput
-                label="Email"
-                placeholder="Enter your email"
-                value={email}
-                onChangeText={setEmail}
-                keyboardType="email-address"
-                autoCapitalize="none"
-              />
+                <TextInput
+                  label="Email"
+                  placeholder="Enter your email"
+                  value={email}
+                  onChangeText={setEmail}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                />
 
-              <Button
-                title="Send Reset Link"
-                onPress={handleSubmit}
-                loading={isLoading}
-                style={styles.submitButton}
-              />
-            </View>
-          ) : (
-            <View style={styles.successContainer}>
-              <Text style={styles.successText}>
-                Please check your email and follow the instructions to reset your password.
-              </Text>
-              <Button
-                title="Back to Login"
-                onPress={() => navigation.navigate('Login')}
-                style={styles.loginButton}
-              />
-            </View>
-          )}
-        </ScrollView>
-      </KeyboardAvoidingView>
+                <Button
+                  title="Send Reset Link"
+                  onPress={handleResetPassword}
+                  loading={isLoading}
+                  style={styles.resetButton}
+                />
+
+                <TouchableOpacity 
+                  style={styles.loginContainer}
+                  onPress={() => navigation.navigate('Login')}
+                >
+                  <Text style={styles.loginText}>Back to Login</Text>
+                </TouchableOpacity>
+              </View>
+            </ScrollView>
+          </KeyboardAvoidingView>
+        </View>
+      </ImageBackground>
     </SafeAreaView>
   );
 };
@@ -125,21 +128,20 @@ const ForgotPasswordScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
   },
-  scrollContainer: {
-    flexGrow: 1,
-    paddingHorizontal: SIZES.xlarge,
-    paddingTop: SIZES.xlarge,
-    paddingBottom: SIZES.xlarge * 2,
+  backgroundImage: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
+  },
+  overlay: {
+    flex: 1,
+  },
+  keyboardView: {
+    flex: 1,
   },
   backButton: {
     marginBottom: SIZES.large,
-  },
-  backButtonText: {
-    fontSize: SIZES.medium,
-    color: COLORS.primary,
-    fontWeight: '600',
   },
   header: {
     alignItems: 'center',
@@ -166,12 +168,8 @@ const styles = StyleSheet.create({
     marginBottom: SIZES.medium,
     textAlign: 'center',
   },
-  submitButton: {
+  resetButton: {
     marginTop: SIZES.large,
-  },
-  successContainer: {
-    alignItems: 'center',
-    marginTop: SIZES.xlarge,
   },
   successText: {
     fontSize: SIZES.medium,
@@ -179,8 +177,15 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: SIZES.xlarge,
   },
-  loginButton: {
+  loginContainer: {
     width: '100%',
+    alignItems: 'center',
+    marginTop: SIZES.large,
+  },
+  loginText: {
+    fontSize: SIZES.medium,
+    color: COLORS.primary,
+    fontWeight: '600',
   },
 });
 

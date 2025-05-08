@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import {
     Dimensions,
     FlatList,
+    ImageBackground,
     SafeAreaView,
     StyleSheet,
     Text,
@@ -10,6 +11,7 @@ import {
     View
 } from 'react-native';
 import { COLORS, SHADOWS, SIZES } from '../../constants/theme';
+import { getTransparentOverlay, useRandomBackground } from '../../utils/backgroundUtils';
 
 const { width } = Dimensions.get('window');
 const LETTER_SIZE = (width - 100) / 4;
@@ -17,6 +19,7 @@ const LETTER_SIZE = (width - 100) / 4;
 const AlphabetAdventureScreen = ({ navigation }) => {
   const [selectedMode, setSelectedMode] = useState('explore'); // explore, trace, match
   const [selectedLetter, setSelectedLetter] = useState(null);
+  const backgroundImage = useRandomBackground();
   
   const alphabet = [
     'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
@@ -90,45 +93,52 @@ const AlphabetAdventureScreen = ({ navigation }) => {
   
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity 
-          style={styles.backButton} 
-          onPress={() => navigation.goBack()}
-        >
-          <FontAwesome5 name="arrow-left" size={18} color={COLORS.text} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Alphabet Adventure</Text>
-      </View>
-      
-      <View style={styles.modeSelector}>
-        <TouchableOpacity 
-          style={[styles.modeButton, selectedMode === 'explore' && styles.activeModeButton]} 
-          onPress={() => setSelectedMode('explore')}
-        >
-          <FontAwesome5 name="book-open" size={18} color={selectedMode === 'explore' ? '#FFF' : COLORS.text} />
-          <Text style={[styles.modeButtonText, selectedMode === 'explore' && styles.activeModeButtonText]}>Explore</Text>
-        </TouchableOpacity>
-        
-        <TouchableOpacity 
-          style={[styles.modeButton, selectedMode === 'trace' && styles.activeModeButton]} 
-          onPress={() => setSelectedMode('trace')}
-        >
-          <FontAwesome5 name="pencil-alt" size={18} color={selectedMode === 'trace' ? '#FFF' : COLORS.text} />
-          <Text style={[styles.modeButtonText, selectedMode === 'trace' && styles.activeModeButtonText]}>Trace</Text>
-        </TouchableOpacity>
-        
-        <TouchableOpacity 
-          style={[styles.modeButton, selectedMode === 'match' && styles.activeModeButton]} 
-          onPress={() => setSelectedMode('match')}
-        >
-          <FontAwesome5 name="th-large" size={18} color={selectedMode === 'match' ? '#FFF' : COLORS.text} />
-          <Text style={[styles.modeButtonText, selectedMode === 'match' && styles.activeModeButtonText]}>Match</Text>
-        </TouchableOpacity>
-      </View>
-      
-      <View style={styles.mainContent}>
-        {renderContent()}
-      </View>
+      <ImageBackground 
+        source={backgroundImage}
+        style={styles.backgroundImage}
+      >
+        <View style={[styles.overlay, getTransparentOverlay()]}>
+          <View style={styles.header}>
+            <TouchableOpacity 
+              style={styles.backButton} 
+              onPress={() => navigation.goBack()}
+            >
+              <FontAwesome5 name="arrow-left" size={18} color={COLORS.text} />
+            </TouchableOpacity>
+            <Text style={styles.headerTitle}>Alphabet Adventure</Text>
+          </View>
+          
+          <View style={styles.modeSelector}>
+            <TouchableOpacity 
+              style={[styles.modeButton, selectedMode === 'explore' && styles.activeModeButton]} 
+              onPress={() => setSelectedMode('explore')}
+            >
+              <FontAwesome5 name="book-open" size={18} color={selectedMode === 'explore' ? '#FFF' : COLORS.text} />
+              <Text style={[styles.modeButtonText, selectedMode === 'explore' && styles.activeModeButtonText]}>Explore</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              style={[styles.modeButton, selectedMode === 'trace' && styles.activeModeButton]} 
+              onPress={() => setSelectedMode('trace')}
+            >
+              <FontAwesome5 name="pencil-alt" size={18} color={selectedMode === 'trace' ? '#FFF' : COLORS.text} />
+              <Text style={[styles.modeButtonText, selectedMode === 'trace' && styles.activeModeButtonText]}>Trace</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              style={[styles.modeButton, selectedMode === 'match' && styles.activeModeButton]} 
+              onPress={() => setSelectedMode('match')}
+            >
+              <FontAwesome5 name="th-large" size={18} color={selectedMode === 'match' ? '#FFF' : COLORS.text} />
+              <Text style={[styles.modeButtonText, selectedMode === 'match' && styles.activeModeButtonText]}>Match</Text>
+            </TouchableOpacity>
+          </View>
+          
+          <View style={styles.mainContent}>
+            {renderContent()}
+          </View>
+        </View>
+      </ImageBackground>
     </SafeAreaView>
   );
 };
@@ -136,7 +146,14 @@ const AlphabetAdventureScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+  },
+  backgroundImage: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
+  },
+  overlay: {
+    flex: 1,
   },
   header: {
     flexDirection: 'row',

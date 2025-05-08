@@ -2,6 +2,7 @@ import { FontAwesome5 } from '@expo/vector-icons';
 import React from 'react';
 import {
   Image,
+  ImageBackground,
   SafeAreaView,
   ScrollView,
   StatusBar,
@@ -11,8 +12,11 @@ import {
   View,
 } from 'react-native';
 import { COLORS, SHADOWS, SIZES } from '../../constants/theme';
+import { getTransparentOverlay, useRandomBackground } from '../../utils/backgroundUtils';
 
 const DiscoverScreen = ({ navigation }) => {
+  const backgroundImage = useRandomBackground();
+
   // Updated discoverCategories with tiles from HomeScreen "Explore & Play" section
   const discoverCategories = [
     {
@@ -60,84 +64,91 @@ const DiscoverScreen = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor={COLORS.background} />
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <View style={styles.header}>
-          <Text style={styles.headerTitle}>Discover</Text>
-          <Text style={styles.headerSubtitle}>Explore new content</Text>
-        </View>
-
-        {/* Search Bar */}
-        <TouchableOpacity style={styles.searchBar}>
-          <FontAwesome5 name="search" size={18} color={COLORS.textLight} style={styles.searchIcon} />
-          <Text style={styles.searchPlaceholder}>Search for fun activities...</Text>
-        </TouchableOpacity>
-
-        {/* Categories - Using the style from HomeScreen's QuickAccessItem */}
-        <View style={styles.categoriesContainer}>
-          {discoverCategories.map((category) => (
-            <TouchableOpacity 
-              key={category.id}
-              style={[styles.categoryCard, { backgroundColor: category.backgroundColor }]}
-              onPress={() => handleCategoryPress(category)}
-            >
-              <View style={styles.categoryContent}>
-                <View style={styles.categoryIconContainer}>
-                  {category.icon}
-                </View>
-                <Text style={styles.categoryTitle}>{category.title}</Text>
-              </View>
-            </TouchableOpacity>
-          ))}
-        </View>
-
-        {/* Featured Content */}
-        <View style={styles.sectionContainer}>
-          <Text style={styles.sectionTitle}>Featured</Text>
-          <View style={styles.featuredCard}>
-            <Image 
-              source={{ uri: 'https://placehold.co/600x400/FFD54F/FFF?text=Featured+Content' }}
-              style={styles.featuredImage}
-              resizeMode="cover"
-            />
-            <View style={styles.featuredContent}>
-              <Text style={styles.featuredTitle}>African Animal Adventure</Text>
-              <Text style={styles.featuredDescription}>Join Kojo on a safari through Africa!</Text>
-              <TouchableOpacity style={styles.playButton}>
-                <FontAwesome5 name="play" size={12} color="#FFF" />
-                <Text style={styles.playButtonText}>Play Now</Text>
-              </TouchableOpacity>
+      <ImageBackground 
+        source={backgroundImage}
+        style={styles.backgroundImage}
+      >
+        <View style={[styles.overlay, getTransparentOverlay()]}>
+          <ScrollView contentContainerStyle={styles.scrollContainer}>
+            <View style={styles.header}>
+              <Text style={styles.headerTitle}>Discover</Text>
+              <Text style={styles.headerSubtitle}>Explore new content</Text>
             </View>
-          </View>
-        </View>
 
-        {/* Coming Soon */}
-        <View style={styles.sectionContainer}>
-          <Text style={styles.sectionTitle}>Coming Soon</Text>
-          <View style={styles.comingSoonContainer}>
-            <TouchableOpacity style={styles.comingSoonCard}>
-              <View style={styles.comingSoonBadge}>
-                <Text style={styles.comingSoonBadgeText}>New</Text>
-              </View>
-              <View style={[styles.comingSoonIconContainer, { backgroundColor: COLORS.accent6 }]}>
-                <FontAwesome5 name="paint-brush" size={24} color="#FFF" />
-              </View>
-              <Text style={styles.comingSoonTitle}>Coloring Book</Text>
-              <Text style={styles.comingSoonDate}>Next Week</Text>
+            {/* Search Bar */}
+            <TouchableOpacity style={styles.searchBar}>
+              <FontAwesome5 name="search" size={18} color={COLORS.textLight} style={styles.searchIcon} />
+              <Text style={styles.searchPlaceholder}>Search for fun activities...</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.comingSoonCard}>
-              <View style={styles.comingSoonBadge}>
-                <Text style={styles.comingSoonBadgeText}>New</Text>
+            {/* Categories - Using the style from HomeScreen's QuickAccessItem */}
+            <View style={styles.categoriesContainer}>
+              {discoverCategories.map((category) => (
+                <TouchableOpacity 
+                  key={category.id}
+                  style={[styles.categoryCard, { backgroundColor: category.backgroundColor }]}
+                  onPress={() => handleCategoryPress(category)}
+                >
+                  <View style={styles.categoryContent}>
+                    <View style={styles.categoryIconContainer}>
+                      {category.icon}
+                    </View>
+                    <Text style={styles.categoryTitle}>{category.title}</Text>
+                  </View>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            {/* Featured Content */}
+            <View style={styles.sectionContainer}>
+              <Text style={styles.sectionTitle}>Featured</Text>
+              <View style={styles.featuredCard}>
+                <Image 
+                  source={{ uri: 'https://placehold.co/600x400/FFD54F/FFF?text=Featured+Content' }}
+                  style={styles.featuredImage}
+                  resizeMode="cover"
+                />
+                <View style={styles.featuredContent}>
+                  <Text style={styles.featuredTitle}>African Animal Adventure</Text>
+                  <Text style={styles.featuredDescription}>Join Kojo on a safari through Africa!</Text>
+                  <TouchableOpacity style={styles.playButton}>
+                    <FontAwesome5 name="play" size={12} color="#FFF" />
+                    <Text style={styles.playButtonText}>Play Now</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
-              <View style={[styles.comingSoonIconContainer, { backgroundColor: COLORS.accent3 }]}>
-                <FontAwesome5 name="shapes" size={24} color="#FFF" />
+            </View>
+
+            {/* Coming Soon */}
+            <View style={styles.sectionContainer}>
+              <Text style={styles.sectionTitle}>Coming Soon</Text>
+              <View style={styles.comingSoonContainer}>
+                <TouchableOpacity style={styles.comingSoonCard}>
+                  <View style={styles.comingSoonBadge}>
+                    <Text style={styles.comingSoonBadgeText}>New</Text>
+                  </View>
+                  <View style={[styles.comingSoonIconContainer, { backgroundColor: COLORS.accent6 }]}>
+                    <FontAwesome5 name="paint-brush" size={24} color="#FFF" />
+                  </View>
+                  <Text style={styles.comingSoonTitle}>Coloring Book</Text>
+                  <Text style={styles.comingSoonDate}>Next Week</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity style={styles.comingSoonCard}>
+                  <View style={styles.comingSoonBadge}>
+                    <Text style={styles.comingSoonBadgeText}>New</Text>
+                  </View>
+                  <View style={[styles.comingSoonIconContainer, { backgroundColor: COLORS.accent3 }]}>
+                    <FontAwesome5 name="shapes" size={24} color="#FFF" />
+                  </View>
+                  <Text style={styles.comingSoonTitle}>Shape Matching</Text>
+                  <Text style={styles.comingSoonDate}>Coming Soon</Text>
+                </TouchableOpacity>
               </View>
-              <Text style={styles.comingSoonTitle}>Shape Matching</Text>
-              <Text style={styles.comingSoonDate}>Coming Soon</Text>
-            </TouchableOpacity>
-          </View>
+            </View>
+          </ScrollView>
         </View>
-      </ScrollView>
+      </ImageBackground>
     </SafeAreaView>
   );
 };
@@ -145,7 +156,14 @@ const DiscoverScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+  },
+  backgroundImage: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
+  },
+  overlay: {
+    flex: 1,
   },
   scrollContainer: {
     paddingHorizontal: SIZES.screenPadding,

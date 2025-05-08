@@ -16,11 +16,14 @@ import {
 } from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import { COLORS, SHADOWS, SIZES } from '../../constants/theme';
+import { getTransparentOverlay, useRandomBackground } from '../../utils/backgroundUtils';
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = (width - (SIZES.screenPadding * 2) - 16) / 2; // Two columns with spacing
 
 const PlayLearnScreen = ({ navigation }) => {
+  const backgroundImage = useRandomBackground();
+  
   // Updated categories without Children's Books
   const categories = [
     {
@@ -81,48 +84,48 @@ const PlayLearnScreen = ({ navigation }) => {
     });
   };
 
-  const backgroundPattern = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1IiBoZWlnaHQ9IjUiPgo8cmVjdCB3aWR0aD0iNSIgaGVpZ2h0PSI1IiBmaWxsPSIjZmZmIj48L3JlY3Q+CjxyZWN0IHdpZHRoPSIxIiBoZWlnaHQ9IjEiIGZpbGw9IiNmMGYwZjAiPjwvcmVjdD4KPC9zdmc+';
-
   return (
     <SafeAreaView style={styles.container}>
       <ImageBackground 
-        source={{ uri: backgroundPattern }}
-        style={styles.backgroundPattern}
+        source={backgroundImage}
+        style={styles.backgroundImage}
       >
-        <View style={styles.header}>
-          <Text style={styles.title}>Play & Learn</Text>
-          <Text style={styles.subtitle}>Choose an activity to play and learn!</Text>
-          <FontAwesome5 name="star" size={18} color={COLORS.accent1} style={styles.star} />
-        </View>
-
-        <ScrollView 
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.scrollViewContent}
-        >
-          <View style={styles.cardsGrid}>
-            {categories.map((category) => (
-              <Animatable.View
-                key={category.id}
-                animation="fadeInUp"
-                delay={200 + (parseInt(category.id) * 100)}
-                duration={500}
-              >
-                <TouchableOpacity 
-                  style={[styles.activityCard, { backgroundColor: category.backgroundColor }]}
-                  onPress={() => handleCardPress(category)}
-                >
-                  <View style={styles.iconCircle}>
-                    {category.icon}
-                  </View>
-                  <View style={styles.cardTextContent}>
-                    <Text style={styles.cardTitle}>{category.title}</Text>
-                    <Text style={styles.cardDescription}>{category.description}</Text>
-                  </View>
-                </TouchableOpacity>
-              </Animatable.View>
-            ))}
+        <View style={[styles.overlay, getTransparentOverlay()]}>
+          <View style={styles.header}>
+            <Text style={styles.title}>Play & Learn</Text>
+            <Text style={styles.subtitle}>Choose an activity to play and learn!</Text>
+            <FontAwesome5 name="star" size={18} color={COLORS.accent1} style={styles.star} />
           </View>
-        </ScrollView>
+
+          <ScrollView 
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={styles.scrollViewContent}
+          >
+            <View style={styles.cardsGrid}>
+              {categories.map((category) => (
+                <Animatable.View
+                  key={category.id}
+                  animation="fadeInUp"
+                  delay={200 + (parseInt(category.id) * 100)}
+                  duration={500}
+                >
+                  <TouchableOpacity 
+                    style={[styles.activityCard, { backgroundColor: category.backgroundColor }]}
+                    onPress={() => handleCardPress(category)}
+                  >
+                    <View style={styles.iconCircle}>
+                      {category.icon}
+                    </View>
+                    <View style={styles.cardTextContent}>
+                      <Text style={styles.cardTitle}>{category.title}</Text>
+                      <Text style={styles.cardDescription}>{category.description}</Text>
+                    </View>
+                  </TouchableOpacity>
+                </Animatable.View>
+              ))}
+            </View>
+          </ScrollView>
+        </View>
       </ImageBackground>
     </SafeAreaView>
   );
@@ -131,9 +134,13 @@ const PlayLearnScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
   },
-  backgroundPattern: {
+  backgroundImage: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
+  },
+  overlay: {
     flex: 1,
   },
   header: {
