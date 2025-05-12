@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { createContext, useContext, useEffect, useState } from 'react';
+import { getLevelById } from '../constants/learningLevels';
 
 // Create context
 const AuthContext = createContext();
@@ -7,193 +8,127 @@ const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [userToken, setUserToken] = useState(null);
-  const [userInfo, setUserInfo] = useState(null);
-  const [childInfo, setChildInfo] = useState(null);
+  const [userData, setUserData] = useState(null);
   const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(false);
 
   useEffect(() => {
-    // Check if user has completed onboarding
-    const checkOnboardingStatus = async () => {
-      try {
-        const onboardingStatus = await AsyncStorage.getItem('onboardingCompleted');
-        if (onboardingStatus) {
-          setHasCompletedOnboarding(true);
-        }
-      } catch (error) {
-        console.log('Error checking onboarding status:', error);
-      }
-    };
-
-    // Check if user is logged in
-    const bootstrapAsync = async () => {
-      try {
-        // Load token from storage
-        const storedToken = await AsyncStorage.getItem('userToken');
-        const storedUserInfo = await AsyncStorage.getItem('userInfo');
-        const storedChildInfo = await AsyncStorage.getItem('childInfo');
-        
-        if (storedToken && storedUserInfo) {
-          setUserToken(storedToken);
-          setUserInfo(JSON.parse(storedUserInfo));
-          
-          if (storedChildInfo) {
-            setChildInfo(JSON.parse(storedChildInfo));
-          }
-        }
-      } catch (error) {
-        console.log('Error checking auth state:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    checkOnboardingStatus();
-    bootstrapAsync();
+    // Load stored data
+    loadStoredData();
   }, []);
+
+  const loadStoredData = async () => {
+    try {
+      const [token, data, onboarding] = await Promise.all([
+        AsyncStorage.getItem('userToken'),
+        AsyncStorage.getItem('userData'),
+        AsyncStorage.getItem('hasCompletedOnboarding'),
+      ]);
+
+      if (token) setUserToken(token);
+      if (data) setUserData(JSON.parse(data));
+      if (onboarding) setHasCompletedOnboarding(onboarding === 'true');
+    } catch (error) {
+      console.error('Error loading stored data:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   // Complete onboarding
   const completeOnboarding = async () => {
     try {
-      await AsyncStorage.setItem('onboardingCompleted', 'true');
+      await AsyncStorage.setItem('hasCompletedOnboarding', 'true');
       setHasCompletedOnboarding(true);
     } catch (error) {
-      console.log('Error completing onboarding:', error);
+      console.error('Error saving onboarding status:', error);
     }
   };
 
   // Login
   const login = async (email, password) => {
-    setIsLoading(true);
     try {
-      // For MVP, we'll mock the API call
-      // In a real app, you would make an API call to authenticate
-      const mockUserInfo = {
-        id: '1',
-        name: 'Demo Parent',
-        email: email,
-        avatarUrl: 'https://via.placeholder.com/150',
+      // TODO: Implement actual login API call
+      const mockToken = 'mock-token-' + Date.now();
+      const mockUserData = {
+        email,
+        name: 'Test User',
+        level: 'LEVEL_1',
       };
-      
-      const mockToken = 'sample-jwt-token-' + Math.random().toString(36).substring(2, 15);
-      
-      // Retrieve stored child info if any (in a real app this would come from the backend)
-      const storedChildInfo = await AsyncStorage.getItem('childInfo');
-      let childInfoData = null;
-      
-      if (storedChildInfo) {
-        childInfoData = JSON.parse(storedChildInfo);
-      } else {
-        // Sample child data if none exists
-        childInfoData = {
-          name: 'Demo Child',
-          age: '4 years',
-          gender: 'Female',
-          grade: 'Pre-K'
-        };
-        await AsyncStorage.setItem('childInfo', JSON.stringify(childInfoData));
-      }
-      
-      // Store auth data
-      await AsyncStorage.setItem('userToken', mockToken);
-      await AsyncStorage.setItem('userInfo', JSON.stringify(mockUserInfo));
-      
-      // Update state
-      setUserInfo(mockUserInfo);
-      setChildInfo(childInfoData);
+
+      await Promise.all([
+        AsyncStorage.setItem('userToken', mockToken),
+        AsyncStorage.setItem('userData', JSON.stringify(mockUserData)),
+      ]);
+
       setUserToken(mockToken);
+      setUserData(mockUserData);
       return { success: true };
     } catch (error) {
-      return { success: false, error: 'Failed to login. Please try again.' };
-    } finally {
-      setIsLoading(false);
+      console.error('Login error:', error);
+      return { success: false, error: error.message };
     }
   };
 
   // Register
-  const register = async (name, email, password, childDetails) => {
-    setIsLoading(true);
+  const register = async (name, email, password, childData) => {
     try {
-      // For MVP, we'll mock the API call
-      const mockUserInfo = {
-        id: '1',
-        name: name,
-        email: email,
-        avatarUrl: 'https://via.placeholder.com/150',
+      // TODO: Implement actual registration API call
+      const mockToken = 'mock-token-' + Date.now();
+      const mockUserData = {
+        email,
+        name,
+        childName: childData.childName,
+        age: childData.age,
+        level: childData.level.id,
       };
-      
-      const mockToken = 'sample-jwt-token-' + Math.random().toString(36).substring(2, 15);
-      
-      // Format child information
-      const childInfoData = {
-        name: childDetails.childName,
-        age: childDetails.childAge,
-        gender: childDetails.childGender,
-        grade: childDetails.childGrade
-      };
-      
-      // Store auth data
-      await AsyncStorage.setItem('userToken', mockToken);
-      await AsyncStorage.setItem('userInfo', JSON.stringify(mockUserInfo));
-      await AsyncStorage.setItem('childInfo', JSON.stringify(childInfoData));
-      
-      // Update state
-      setUserInfo(mockUserInfo);
-      setChildInfo(childInfoData);
+
+      await Promise.all([
+        AsyncStorage.setItem('userToken', mockToken),
+        AsyncStorage.setItem('userData', JSON.stringify(mockUserData)),
+      ]);
+
       setUserToken(mockToken);
+      setUserData(mockUserData);
       return { success: true };
     } catch (error) {
-      return { success: false, error: 'Failed to register. Please try again.' };
-    } finally {
-      setIsLoading(false);
+      console.error('Registration error:', error);
+      return { success: false, error: error.message };
     }
   };
 
   // Logout
   const logout = async () => {
-    setIsLoading(true);
     try {
-      // In a real app, you might want to make an API call to invalidate the token
-      await AsyncStorage.removeItem('userToken');
-      await AsyncStorage.removeItem('userInfo');
-      // We're not removing child info to persist it between sessions
-      
+      await Promise.all([
+        AsyncStorage.removeItem('userToken'),
+        AsyncStorage.removeItem('userData'),
+      ]);
       setUserToken(null);
-      setUserInfo(null);
+      setUserData(null);
     } catch (error) {
-      console.log('Error logging out:', error);
-    } finally {
-      setIsLoading(false);
+      console.error('Logout error:', error);
     }
   };
 
-  // Update Child Info
-  const updateChildInfo = async (updatedChildInfo) => {
-    try {
-      const newChildInfo = { ...childInfo, ...updatedChildInfo };
-      await AsyncStorage.setItem('childInfo', JSON.stringify(newChildInfo));
-      setChildInfo(newChildInfo);
-      return { success: true };
-    } catch (error) {
-      console.log('Error updating child info:', error);
-      return { success: false, error: 'Failed to update child information.' };
-    }
+  const getUserLevel = () => {
+    if (!userData || !userData.level) return getLevelById('LEVEL_1');
+    return getLevelById(userData.level);
+  };
+
+  const value = {
+    isLoading,
+    userToken,
+    userData,
+    hasCompletedOnboarding,
+    login,
+    register,
+    logout,
+    completeOnboarding,
+    getUserLevel,
   };
 
   return (
-    <AuthContext.Provider
-      value={{
-        isLoading,
-        userToken,
-        userInfo,
-        childInfo,
-        hasCompletedOnboarding,
-        login,
-        logout,
-        register,
-        completeOnboarding,
-        updateChildInfo
-      }}
-    >
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );

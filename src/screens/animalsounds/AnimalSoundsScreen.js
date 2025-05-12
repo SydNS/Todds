@@ -1,19 +1,19 @@
 import { FontAwesome5 } from '@expo/vector-icons';
-import { Audio } from 'expo-av';
 import React, { useEffect, useState } from 'react';
 import {
-  Alert,
-  Dimensions,
-  Image,
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View
+    Alert,
+    Dimensions,
+    Image,
+    SafeAreaView,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View
 } from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import { COLORS, SHADOWS, SIZES } from '../../constants/theme';
+import { playSound, stopSound } from '../../utils/mediaUtils';
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = (width - 60) / 2;
@@ -21,7 +21,7 @@ const CARD_WIDTH = (width - 60) / 2;
 const AnimalSoundsScreen = ({ navigation }) => {
   const [selectedAnimal, setSelectedAnimal] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [sound, setSound] = useState(null);
+  const [currentSound, setCurrentSound] = useState(null);
   
   // Request audio permissions when component mounts
   useEffect(() => {
@@ -47,12 +47,12 @@ const AnimalSoundsScreen = ({ navigation }) => {
   // Cleanup sound on unmount
   useEffect(() => {
     return () => {
-      if (sound) {
+      if (currentSound) {
         console.log('Unloading Sound');
-        sound.unloadAsync();
+        stopSound(currentSound);
       }
     };
-  }, [sound]);
+  }, [currentSound]);
   
   // Updated animal data with reliable HTTPS audio sources
   const animals = [
@@ -100,86 +100,30 @@ const AnimalSoundsScreen = ({ navigation }) => {
     },
   ];
   
-  async function playSound(animal) {
-    console.log('Attempting to load sound for:', animal.name);
-    
-    try {
-      // Unload the previous sound if it exists
-      if (sound) {
-        console.log('Unloading previous sound');
-        await sound.unloadAsync();
-      }
-      
-      // Set up audio mode for playback
-      console.log('Setting up audio mode');
-      await Audio.setAudioModeAsync({
-        allowsRecordingIOS: false,
-        staysActiveInBackground: false,
-        playsInSilentModeIOS: true,
-        shouldDuckAndroid: true,
-        playThroughEarpieceAndroid: false,
-      });
-      
-      console.log('Loading sound from URL:', animal.audioUrl);
-      
-      // Create and load new sound from URL
-      const { sound: newSound } = await Audio.Sound.createAsync(
-        { uri: animal.audioUrl },
-        { shouldPlay: true, volume: 1.0 },
-        (status) => {
-          console.log('Loading status:', status);
-          if (status.error) {
-            console.error('Sound loading error:', status.error);
-          }
-        }
-      );
-      
-      console.log('Sound loaded successfully');
-      setSound(newSound);
-      setIsPlaying(true);
-      
-      // Monitor playback status
-      newSound.setOnPlaybackStatusUpdate((status) => {
-        // Log playback status
-        if (status.isLoaded) {
-          console.log('Playback status:', 
-            status.isPlaying ? 'Playing' : 'Paused', 
-            'Position:', status.positionMillis,
-            'Duration:', status.durationMillis
-          );
-        } else if (status.error) {
-          console.error('Playback error:', status.error);
-        }
-        
-        if (status.didJustFinish) {
-          console.log('Sound finished playing');
-          setIsPlaying(false);
-        }
-      });
-      
-    } catch (error) {
-      console.error('Error playing sound:', error);
-      
-      // More detailed error information
-      const errorDetails = error.message ? `\nDetails: ${error.message}` : '';
-      const errorCode = error.code ? `\nCode: ${error.code}` : '';
-      
-      Alert.alert(
-        'Sound Error', 
-        `There was a problem playing the animal sound.${errorDetails}${errorCode}`,
-        [{ text: 'OK' }]
-      );
-      
-      setIsPlaying(false);
-    }
-  }
-  
   const handleAnimalPress = (animal) => {
     console.log('Animal pressed:', animal.name);
     setSelectedAnimal(animal);
     
     // Play the animal sound
-    playSound(animal);
+    handlePlaySound(animal.audioUrl);
+  };
+  
+  const handlePlaySound = async (soundFile) => {
+    try {
+      const sound = await playSound(soundFile);
+      setCurrentSound(sound);
+    } catch (error) {
+      console.error('Error playing sound:', error);
+    }
+  };
+  
+  const handleStopSound = async () => {
+    try {
+      await stopSound(currentSound);
+      setCurrentSound(null);
+    } catch (error) {
+      console.error('Error stopping sound:', error);
+    }
   };
   
   return (

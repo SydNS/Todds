@@ -1,19 +1,18 @@
 import { FontAwesome5, MaterialIcons } from '@expo/vector-icons';
-import { Audio } from 'expo-av';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
-  Alert,
-  Dimensions,
-  Image,
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
+    Dimensions,
+    Image,
+    SafeAreaView,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View
 } from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import { COLORS, SHADOWS, SIZES } from '../../constants/theme';
+import { playSound, stopSound } from '../../utils/mediaUtils';
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = (width - 60) / 2;
@@ -23,38 +22,7 @@ const SoundItOutScreen = ({ navigation }) => {
   const [selectedOption, setSelectedOption] = useState(null);
   const [isCorrect, setIsCorrect] = useState(null);
   const [score, setScore] = useState(0);
-  const [sound, setSound] = useState(null);
-
-  // Request audio permissions when component mounts
-  useEffect(() => {
-    (async () => {
-      try {
-        console.log("Requesting audio permissions...");
-        const permission = await Audio.requestPermissionsAsync();
-        console.log("Permission response:", permission);
-        
-        if (permission.status !== 'granted') {
-          Alert.alert(
-            'Permission Required',
-            'Audio playback requires microphone permission',
-            [{ text: 'OK' }]
-          );
-        }
-      } catch (error) {
-        console.error("Error requesting permissions:", error);
-      }
-    })();
-  }, []);
-
-  // Cleanup sound on unmount
-  useEffect(() => {
-    return () => {
-      if (sound) {
-        console.log('Unloading Sound');
-        sound.unloadAsync();
-      }
-    };
-  }, [sound]);
+  const [currentSound, setCurrentSound] = useState(null);
 
   const levels = [
     {
@@ -121,81 +89,22 @@ const SoundItOutScreen = ({ navigation }) => {
     }, 1500);
   };
   
-  async function playSound() {
-    const currentSound = levels[currentLevel];
-    console.log('Attempting to play sound for:', currentSound.targetSound);
-    
+  const handlePlaySound = async (soundFile) => {
     try {
-      // Unload the previous sound if it exists
-      if (sound) {
-        console.log('Unloading previous sound');
-        await sound.unloadAsync();
-      }
-      
-      // Set up audio mode
-      console.log('Setting up audio mode');
-      await Audio.setAudioModeAsync({
-        allowsRecordingIOS: false,
-        staysActiveInBackground: false,
-        playsInSilentModeIOS: true,
-        shouldDuckAndroid: true,
-        playThroughEarpieceAndroid: false,
-      });
-      
-      console.log('Loading sound from URL:', currentSound.audioUrl);
-      
-      // Create new sound instance from URL
-      const { sound: newSound } = await Audio.Sound.createAsync(
-        { uri: currentSound.audioUrl },
-        { shouldPlay: true, volume: 1.0 },
-        (status) => {
-          console.log('Loading status:', status);
-          if (status.error) {
-            console.error('Sound loading error:', status.error);
-          }
-        }
-      );
-      
-      console.log('Sound loaded successfully');
-      setSound(newSound);
-      
-      // Monitor playback status
-      newSound.setOnPlaybackStatusUpdate((status) => {
-        // Log playback status
-        if (status.isLoaded) {
-          console.log('Playback status:', 
-            status.isPlaying ? 'Playing' : 'Paused', 
-            'Position:', status.positionMillis,
-            'Duration:', status.durationMillis
-          );
-        } else if (status.error) {
-          console.error('Playback error:', status.error);
-        }
-        
-        if (status.didJustFinish) {
-          console.log('Sound finished playing');
-        }
-      });
-      
+      const sound = await playSound(soundFile);
+      setCurrentSound(sound);
     } catch (error) {
       console.error('Error playing sound:', error);
-      
-      // More detailed error information
-      const errorDetails = error.message ? `\nDetails: ${error.message}` : '';
-      const errorCode = error.code ? `\nCode: ${error.code}` : '';
-      
-      Alert.alert(
-        'Sound Error', 
-        `There was a problem playing the sound.${errorDetails}${errorCode}`,
-        [{ text: 'OK' }]
-      );
     }
-  }
+  };
   
-  const handlePlaySound = () => {
-    console.log('Play sound button pressed');
-    // Play the current target letter sound
-    playSound();
+  const handleStopSound = async () => {
+    try {
+      await stopSound(currentSound);
+      setCurrentSound(null);
+    } catch (error) {
+      console.error('Error stopping sound:', error);
+    }
   };
   
   const currentLevelData = levels[currentLevel];
@@ -236,7 +145,7 @@ const SoundItOutScreen = ({ navigation }) => {
           
           <TouchableOpacity 
             style={styles.playButton}
-            onPress={handlePlaySound}
+            onPress={() => handlePlaySound(currentLevelData.audioUrl)}
           >
             <FontAwesome5 name="volume-up" size={24} color="#FFF" />
             <Text style={styles.playButtonText}>Play Sound</Text>

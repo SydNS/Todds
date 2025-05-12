@@ -8,28 +8,66 @@ const { width, height } = Dimensions.get('window');
 
 // Base colors
 export const COLORS = {
-  // Primary app colors
-  primary: '#4FC3F7',       // Bright blue
-  secondary: '#FF8A65',      // Coral orange
-  tertiary: '#AED581',       // Light green
-  background: '#F5F9FF',     // Light background
-  card: '#FFFFFF',          // White for cards
-  text: '#3A3A3A',          // Dark gray for main text
-  textLight: '#757575',      // Medium gray for secondary text
+  primary: '#1E5FBF',
+  secondary: '#2D7DD2',
+  tertiary: '#72A1E5',
+  
+  background: '#F5F8FA',
+  card: '#FFFFFF',
+  border: '#E1E1E1',
+  
+  text: '#333333',
+  textLight: '#666666',
+  textMuted: '#999999',
+  
+  success: '#28A745',
+  warning: '#FFC107',
+  error: '#DC3545',
+  info: '#17A2B8',
+  
+  // Government Theme Colors
+  govBlue: {
+    primary: '#1E5FBF',
+    secondary: '#3A7BD5',
+    accent: '#6394DA',
+    highlight: '#B1CBF1',
+  },
+  
+  civicGreen: {
+    primary: '#2A9D8F',
+    secondary: '#48B7AB',
+    accent: '#76D1C8',
+    highlight: '#B6E6E1',
+  },
+  
+  justiceRed: {
+    primary: '#E63946',
+    secondary: '#EA5D68',
+    accent: '#EF8993',
+    highlight: '#F7C4C9',
+  },
+  
+  legislativeYellow: {
+    primary: '#F4A261',
+    secondary: '#F6B483',
+    accent: '#F8C7A6',
+    highlight: '#FBE3D3',
+  },
+  
+  publicServicesOrange: {
+    primary: '#E76F51',
+    secondary: '#EB8A72',
+    accent: '#F0A893',
+    highlight: '#F7D3CA',
+  },
   
   // Accent colors
-  accent1: '#FFD54F',        // Yellow
-  accent2: '#CE93D8',        // Purple
-  accent3: '#4DB6AC',        // Teal
-  accent4: '#FF8A65',        // Coral
-  accent5: '#4FC3F7',        // Light blue
-  accent6: '#F06292',        // Pink
-  
-  // Status colors
-  success: '#AED581',        // Green
-  error: '#FF8A65',          // Red
-  warning: '#FFD54F',        // Yellow
-  info: '#29B6F6',           // Light blue for info
+  accent1: '#9B5DE5',
+  accent2: '#F15BB5',
+  accent3: '#00BBF9',
+  accent4: '#00F5D4',
+  accent5: '#FD8A09',
+  accent6: '#FB6107',
   
   // Utility colors
   shadow: 'rgba(0, 0, 0, 0.1)', // Shadow color
@@ -123,32 +161,15 @@ export const FONT = {
 
 // Size configurations for consistent UI
 export const SIZES = {
-  // Global sizes
-  base: 8,
+  // Font sizes
   small: 12,
   font: 14,
   medium: 16,
-  large: 20,
-  xlarge: 24,
-  xxlarge: 32,
-  xxxlarge: 40,
+  large: 18,
+  xlarge: 20,
+  xxlarge: 24,
   
-  // Specific sizes
-  buttonHeight: 50,
-  inputHeight: 50,
-  borderRadius: 12,
-  cardRadius: 20,
-  
-  // Screen padding
-  screenPadding: 16,
-  
-  // Icon sizes
-  iconSmall: 16,
-  iconMedium: 24,
-  iconLarge: 32,
-  iconXLarge: 48,
-  
-  // Spacing system
+  // Spacing
   spacing: {
     xs: 4,
     s: 8,
@@ -161,38 +182,50 @@ export const SIZES = {
   // Screen dimensions
   width,
   height,
+  
+  // UI elements
+  borderRadius: 8,
+  cardRadius: 12,
+  buttonRadius: 8,
+  screenPadding: 16,
+  
+  // Icon sizes
+  iconSmall: 16,
+  iconMedium: 24,
+  iconLarge: 32,
+  iconXLarge: 48,
 };
 
 // Shadow styles for different elevations
 export const SHADOWS = {
   small: {
-    shadowColor: "#000",
+    shadowColor: '#000',
     shadowOffset: {
       width: 0,
       height: 2,
     },
     shadowOpacity: 0.1,
-    shadowRadius: 4,
+    shadowRadius: 3,
     elevation: 3,
   },
   medium: {
-    shadowColor: "#000",
+    shadowColor: '#000',
     shadowOffset: {
       width: 0,
-      height: 3,
+      height: 4,
     },
     shadowOpacity: 0.15,
     shadowRadius: 6,
     elevation: 5,
   },
   large: {
-    shadowColor: "#000",
+    shadowColor: '#000',
     shadowOffset: {
       width: 0,
-      height: 5,
+      height: 8,
     },
     shadowOpacity: 0.2,
-    shadowRadius: 8,
+    shadowRadius: 10,
     elevation: 8,
   },
 };

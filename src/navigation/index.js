@@ -19,7 +19,9 @@ import LearnPhonicsScreen from '../screens/learnphonics/LearnPhonicsScreen';
 import MemoryMixScreen from '../screens/memorymix/MemoryMixScreen';
 import OnboardingScreen from '../screens/onboarding/OnboardingScreen';
 import PuzzlesGamesScreen from '../screens/puzzlesgames/PuzzlesGamesScreen';
+import AllStoriesScreen from '../screens/readstory/AllStoriesScreen';
 import ReadStoryScreen from '../screens/readstory/ReadStoryScreen';
+import StoryDetailsScreen from '../screens/readstory/StoryDetailsScreen';
 import SingWithUsScreen from '../screens/singwithus/SingWithUsScreen';
 import SoundItOutScreen from '../screens/sounditout/SoundItOutScreen';
 import TodaysChallengeScreen from '../screens/todayschallenge/TodaysChallengeScreen';
@@ -27,12 +29,12 @@ import WeeklyFavoritesScreen from '../screens/weeklyfavorites/WeeklyFavoritesScr
 
 // Import game screens
 import {
-  AlphabetSafariGame,
-  AnimalSoundsGame,
-  CardFlipGame,
-  CountingFunGame,
-  LetterMatchingGame,
-  RememberSequenceGame
+    AlphabetSafariGame,
+    AnimalSoundsGame,
+    CardFlipGame,
+    CountingFunGame,
+    LetterMatchingGame,
+    RememberSequenceGame
 } from '../games';
 import { GamesIndexScreen } from '../screens/games';
 
@@ -101,6 +103,8 @@ const Navigation = ({ onReady }) => {
             <Stack.Screen name="CountingFunGame" component={CountingFunGame} />
             <Stack.Screen name="RememberSequenceGame" component={RememberSequenceGame} />
             <Stack.Screen name="GamesIndex" component={GamesIndexScreen} />
+            <Stack.Screen name="AllStories" component={AllStoriesScreen} />
+            <Stack.Screen name="StoryDetails" component={StoryDetailsScreen} />
           </Stack.Group>
         ) : (
           // User is not logged in, show auth screens

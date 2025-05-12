@@ -3,6 +3,7 @@ import {
     MaterialCommunityIcons,
     MaterialIcons
 } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 import React from 'react';
 import {
     Dimensions,
@@ -11,6 +12,7 @@ import {
     ScrollView,
     StyleSheet,
     Text,
+    TouchableOpacity,
     View
 } from 'react-native';
 import * as Animatable from 'react-native-animatable';
@@ -21,6 +23,7 @@ const COLUMN_WIDTH = width * 0.42;
 const SPACING = 16;
 
 const StoryWorldScreen = () => {
+  const navigation = useNavigation();
   const storyCategories = [
     {
       id: '1',
@@ -75,7 +78,16 @@ const StoryWorldScreen = () => {
       backgroundColor: COLORS.accent3,
       onPress: () => console.log('Create a Story pressed'),
       height: 190,
-    }
+    },
+    {
+      id: '0',
+      title: 'All Stories',
+      description: 'See every story in one place',
+      icon: <FontAwesome5 name="book" size={34} color="#333" />,
+      backgroundColor: COLORS.accent5,
+      onPress: () => navigation.navigate('AllStories'),
+      height: 200,
+    },
   ];
 
   // Background pattern for subtle texture
@@ -155,28 +167,29 @@ const StoryWorldScreen = () => {
 // Custom component for story cards
 const StoryCard = ({ category }) => {
   return (
-    <Animatable.View 
-      animation="pulse" 
-      iterationCount={1}
-      duration={1000}
-      style={[styles.storyCard, { height: category.height, backgroundColor: category.backgroundColor }]}
-    >
+    <TouchableOpacity activeOpacity={0.8} onPress={category.onPress} style={{ flex: 1 }}>
       <Animatable.View 
         animation="pulse" 
-        iterationCount="infinite" 
-        duration={2000}
-        style={styles.iconContainer}
+        iterationCount={1}
+        duration={1000}
+        style={[styles.storyCard, { height: category.height, backgroundColor: category.backgroundColor }]}
       >
-        <View style={styles.iconCircle}>
-          {category.icon}
+        <Animatable.View 
+          animation="pulse" 
+          iterationCount="infinite" 
+          duration={2000}
+          style={styles.iconContainer}
+        >
+          <View style={styles.iconCircle}>
+            {category.icon}
+          </View>
+        </Animatable.View>
+        <View style={styles.textContainer}>
+          <Text style={styles.cardTitle}>{category.title}</Text>
+          <Text style={styles.cardDescription}>{category.description}</Text>
         </View>
       </Animatable.View>
-      
-      <View style={styles.textContainer}>
-        <Text style={styles.cardTitle}>{category.title}</Text>
-        <Text style={styles.cardDescription}>{category.description}</Text>
-      </View>
-    </Animatable.View>
+    </TouchableOpacity>
   );
 };
 

@@ -3,9 +3,9 @@ import { useEffect, useState } from 'react';
 // For screens that need specific backgrounds
 export const SCREEN_TYPES = {
   HOME: 'home',
-  MY_CORNER: 'my_corner',
-  SING: 'sing',
-  BOOKS: 'books',
+  DASHBOARD: 'dashboard',
+  LEGISLATIVE: 'legislative',
+  SERVICES: 'services',
   GENERIC: 'generic'
 };
 
@@ -27,14 +27,14 @@ export const getTransparentOverlay = (opacity = 0.3) => {
  */
 export const getScreenBackground = (screenType = SCREEN_TYPES.GENERIC) => {
   switch (screenType) {
-    case SCREEN_TYPES.MY_CORNER:
-      // Use the child-friendly cartoon park background for My Corner
+    case SCREEN_TYPES.DASHBOARD:
+      // Use the government dashboard background
       return require('../../assets/images/bg3.png');
     
-    case SCREEN_TYPES.SING:
+    case SCREEN_TYPES.LEGISLATIVE:
       return require('../../assets/images/bg4.png');
       
-    case SCREEN_TYPES.BOOKS:
+    case SCREEN_TYPES.SERVICES:
       return require('../../assets/images/bg5.png');
       
     case SCREEN_TYPES.HOME:

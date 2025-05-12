@@ -12,7 +12,8 @@ import {
 } from 'react-native';
 import Button from '../../components/Button';
 import TextInput from '../../components/TextInput';
-import { COLORS, SIZES } from '../../constants/theme';
+import { getLevelByAge } from '../../constants/learningLevels';
+import { COLORS, SHADOWS, SIZES } from '../../constants/theme';
 import { useAuth } from '../../context/AuthContext';
 import { getTransparentOverlay, useRandomBackground } from '../../utils/backgroundUtils';
 
@@ -25,13 +26,25 @@ const SignupScreen = ({ navigation }) => {
   
   // Child specific details
   const [childName, setChildName] = useState('');
-  const [childAge, setChildAge] = useState('');
-  const [childGender, setChildGender] = useState('');
-  const [childGrade, setChildGrade] = useState('');
+  const [age, setAge] = useState('');
+  const [selectedLevel, setSelectedLevel] = useState(null);
   
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const backgroundImage = useRandomBackground();
+
+  const handleAgeChange = (value) => {
+    setAge(value);
+    const ageNum = parseInt(value);
+    if (!isNaN(ageNum) && ageNum >= 2 && ageNum <= 8) {
+      const level = getLevelByAge(ageNum);
+      if (level.id !== selectedLevel?.id) {
+        setSelectedLevel(level);
+      }
+    } else {
+      setSelectedLevel(null);
+    }
+  };
 
   const validateEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -52,7 +65,7 @@ const SignupScreen = ({ navigation }) => {
       return;
     }
 
-    if (!childName || !childAge || !childGender || !childGrade) {
+    if (!childName || !age) {
       setError('Please fill in all child details');
       return;
     }
@@ -77,9 +90,8 @@ const SignupScreen = ({ navigation }) => {
     try {
       const result = await register(name, email, password, {
         childName,
-        childAge,
-        childGender,
-        childGrade
+        age,
+        level: selectedLevel
       });
       
       if (!result.success) {
@@ -163,26 +175,28 @@ const SignupScreen = ({ navigation }) => {
                 <TextInput
                   label="Age"
                   placeholder="Enter child's age (e.g., 4 years)"
-                  value={childAge}
-                  onChangeText={setChildAge}
+                  value={age}
+                  onChangeText={handleAgeChange}
                   keyboardType="number-pad"
                 />
-                
-                <TextInput
-                  label="Gender"
-                  placeholder="Enter child's gender"
-                  value={childGender}
-                  onChangeText={setChildGender}
-                  autoCapitalize="words"
-                />
-                
-                <TextInput
-                  label="Grade/Class"
-                  placeholder="Enter child's grade or class (e.g., Pre-K)"
-                  value={childGrade}
-                  onChangeText={setChildGrade}
-                  autoCapitalize="words"
-                />
+
+                {selectedLevel && (
+                  <View style={styles.levelContainer}>
+                    <Text style={styles.levelTitle}>Recommended Level:</Text>
+                    <View style={styles.levelCard}>
+                      <Text style={styles.levelName}>{selectedLevel.name}</Text>
+                      <Text style={styles.levelAge}>Age: {selectedLevel.ageRange}</Text>
+                      <Text style={styles.levelDescription}>{selectedLevel.description}</Text>
+                      <View style={styles.skillsContainer}>
+                        {selectedLevel.skills.map((skill, index) => (
+                          <View key={index} style={styles.skillTag}>
+                            <Text style={styles.skillText}>{skill}</Text>
+                          </View>
+                        ))}
+                      </View>
+                    </View>
+                  </View>
+                )}
 
                 <Button
                   title="Sign Up"
@@ -279,6 +293,54 @@ const styles = StyleSheet.create({
     color: COLORS.textLight,
     textAlign: 'center',
     marginTop: SIZES.xlarge,
+  },
+  levelContainer: {
+    marginVertical: SIZES.spacing.m,
+  },
+  levelTitle: {
+    fontSize: SIZES.medium,
+    fontWeight: 'bold',
+    color: COLORS.text,
+    marginBottom: SIZES.spacing.s,
+  },
+  levelCard: {
+    backgroundColor: COLORS.background,
+    borderRadius: SIZES.borderRadius,
+    padding: SIZES.spacing.m,
+    ...SHADOWS.small,
+  },
+  levelName: {
+    fontSize: SIZES.medium,
+    fontWeight: 'bold',
+    color: COLORS.primary,
+    marginBottom: SIZES.spacing.xs,
+  },
+  levelAge: {
+    fontSize: SIZES.small,
+    color: COLORS.textLight,
+    marginBottom: SIZES.spacing.xs,
+  },
+  levelDescription: {
+    fontSize: SIZES.font,
+    color: COLORS.text,
+    marginBottom: SIZES.spacing.s,
+  },
+  skillsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginTop: SIZES.spacing.s,
+  },
+  skillTag: {
+    backgroundColor: COLORS.primary + '20',
+    borderRadius: SIZES.borderRadius,
+    paddingHorizontal: SIZES.spacing.s,
+    paddingVertical: SIZES.spacing.xs,
+    marginRight: SIZES.spacing.xs,
+    marginBottom: SIZES.spacing.xs,
+  },
+  skillText: {
+    fontSize: SIZES.small,
+    color: COLORS.primary,
   },
 });
 

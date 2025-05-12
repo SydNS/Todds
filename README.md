@@ -1,128 +1,55 @@
-# Shekhinah Toddler's Learning App
+# GovRev
 
-A React Native/Expo app focused on creating an educational platform for African toddlers, with colorful, interactive screens designed to make learning fun and engaging.
-
-
-## Features
-
-### 📱 Bottom Navigation Tabs
-
-Each tab is color-coded with animated icons and child-friendly names:
-
-- **Story World** - Interactive stories and folktales with African themes
-- **Phonics Fun** - Letter learning with sounds and visuals
-- **Play & Learn** - Interactive exercise categories and games
-- **Today's Challenge** - Daily learning tasks based on skill level
-- **My Corner** - Child profile, progress tracking, and settings
-
-### 🎮 Play & Learn Categories
-
-A visually appealing page with categorized learning activities:
-
-- **Alphabet Adventure** - Trace, match, and say letters
-- **Animal Sounds Safari** - Match animals to their sounds
-- **Color Quest** - Identify and learn about colors
-- **Sound It Out!** - Phonics-based sound recognition
-- **Memory Mix** - Matching game for cognitive development
-- **Draw & Tell** - Creative drawing with voice recording
-
-### 🎯 Today's Challenge
-
-Interactive daily challenges with:
-
-- Skill-appropriate activities
-- Celebratory animations on completion
-- Progress tracking
-- "Try Again" and "Next Challenge" options
-
-### 👧 My Corner (Profile)
-
-A personalized space featuring:
-
-- Customizable avatar
-- Progress charts with fun visuals
-- Badge collection for achievements
-- Dark/light mode toggle
-- Settings for parents
-
-### ✨ Animation & Visual Design
-
-- **Kid-friendly UI** - Rounded corners, bright colors, and playful elements
-- **Interactive animations** - Button bounces, pulse effects, and celebratory animations
-- **Consistent theme** - Color-coded sections based on activity type
-- **Accessibility** - Dark mode and text size options
-
-## Illustration
-
-![img.png](img.png)![img_1.png](img_1.png)![img_2.png](img_2.png)
-![bg1.jpeg](bg1.jpeg)![bg2.jpeg](bg2.jpeg)![bg3.jpeg](bg3.jpeg)
-![img_3.png](img_3.png)![img_5.png](img_5.png)![img_6.png](img_6.png)
-![bg1.jpeg](bg4.jpeg)![bg4.jpeg](bg4.jpeg)![bg5.jpeg](bg5.jpeg)
-![img.png](img.png)![img_1.png](img_1.png)![img_2.png](img_2.png)
-
-![img_7.png](img_7.png) ![img_8.png](img_8.png)
-
-
-
-## Technology Stack
-
-- **React Native** & **Expo** - Core framework
-- **React Navigation** - Tab and stack navigation
-- **@expo/vector-icons** - Icon sets
-- **react-native-reanimated** & **react-native-animatable** - Animation libraries
-- **lottie-react-native** - Complex animations
-
-## Getting Started
-
-### Prerequisites
-
-- Node.js (>= 16)
-- Expo CLI
-- iOS Simulator or Android Emulator (or physical device)
-
-### Installation
-
-1. Clone the repository:
-
-   ```
-   git clone https://github.com/yourusername/shekhinah-toddlers-app.git
-   cd shekhinah-toddlers-app
-   ```
-
-2. Install dependencies:
-
-   ```
-   npm install
-   ```
-
-3. Start the Expo development server:
-
-   ```
-   npm start
-   ```
-
-4. Open the app on your device or simulator:
-   - Press `i` for iOS simulator
-   - Press `a` for Android emulator
-   - Scan the QR code with Expo Go on your device
+A mobile application for government services and civic engagement built with React Native and Expo.
 
 ## Project Structure
 
-- `/src/components` - Reusable UI components
-- `/src/constants` - Theme, colors, and design constants
-- `/src/screens` - App screens organized by feature
-- `/src/navigation` - Navigation configuration
-- `/src/utils` - Utility functions and animation helpers
-- `/src/assets` - Images, animations, and other static assets
+```
+GovRev/
+├── assets/
+│   └── images/           # Background and other images
+├── src/
+│   ├── components/       # Reusable UI components
+│   ├── constants/        # App constants and theme
+│   ├── screens/          # Application screens
+│   │   ├── dashboard/    # Dashboard screen
+│   │   ├── home/         # Home screen
+│   │   └── ...
+│   └── utils/            # Utility functions
+└── App.js                # Main application entry point
+```
 
-## Roadmap
+## Features
 
-- Add content for Story World and Phonics Fun sections
-- Implement parent dashboard for monitoring progress
-- Add multilingual support for African languages
-- Integrate with backend for user accounts and progress syncing
+- Modern UI with transparent background implementation
+- Dashboard with activity tracking
+- Government services directory
+- Legislative updates
+- Citizen engagement tools
 
-## Contributors
+## Setup and Running
 
-- Sydney Nsiimbe - Project lead & Developer
-![img_4.png](img_4.png)
+1. Install dependencies:
+```
+npm install
+```
+
+2. Start the application:
+```
+npm start
+```
+
+3. Use Expo Go app on your device or an emulator to open the application.
+
+## Tech Stack
+
+- React Native
+- Expo
+- React Native Animatable
+
+## Development
+
+This project follows a consistent component structure and uses the following UI patterns:
+- Transparent overlays with the getTransparentOverlay() utility
+- Random background images via useRandomBackground() hook
+- Consistent color themes defined in theme.js
